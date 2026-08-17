@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Claims Routing Console</title>
+<style>
+html,body{margin:0;padding:0;background:#0b0b12}
+body{padding:16px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif}
+.wf{--vi:#a78bfa;--gn:#34d399;--am:#fbbf24;--rd:#fb7185;--gy:#8b8fa3;--ln:#23233a;--cd:#15151f;
+  background:#0b0b12;color:#e9e9f2;max-width:100%}
+.hd{background:linear-gradient(90deg,#16162a,#15151f);padding:14px 16px;border-bottom:1px solid var(--ln);
+  display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.hd h1{font-size:21px;font-weight:800;letter-spacing:-.3px;margin:0}
+.hd .sb{font-size:9.5px;text-transform:uppercase;letter-spacing:2.2px;color:var(--gy);margin-top:5px}
+.tog{display:flex;gap:0}
+.tog button{background:transparent;border:1px solid var(--ln);border-right:none;color:var(--gy);
+  padding:8px 16px;font-size:9.5px;letter-spacing:1.6px;cursor:pointer;font-weight:600;
+  font-family:inherit;text-transform:uppercase;transition:.15s}
+.tog button:last-child{border-right:1px solid var(--ln)}
+.tog button.on{background:var(--vi);color:#1a1030;border-color:var(--vi)}
+.tog button:hover:not(.on){color:#d9d5f5}
+.kpi{display:flex;flex-wrap:wrap;gap:10px;padding:14px 16px}
+.k{flex:1 1 160px;background:var(--cd);border:1px solid var(--ln);border-radius:8px;padding:12px 14px;
+  border-top:2px solid var(--vi)}
+.k.g{border-top-color:var(--gn)} .k.a{border-top-color:var(--am)} .k.r{border-top-color:var(--rd)}
+.k .l{font-size:9.5px;text-transform:uppercase;letter-spacing:1.6px;color:var(--gy)}
+.k .v{font-size:25px;font-weight:800;font-family:monospace;letter-spacing:-1px;margin:7px 0 3px}
+.k .s{font-size:10.5px;color:var(--gy);line-height:1.45}
+.k .d{font-size:10.5px;margin-top:4px;font-weight:700}
+.sec{padding:0 16px}
+.pt{font-size:9.5px;text-transform:uppercase;letter-spacing:2px;color:var(--gy);margin:6px 0 12px}
+.main{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;padding:14px 16px 16px}
+@media(max-width:980px){.main{grid-template-columns:1fr}}
+.pnl{background:var(--cd);border:1px solid var(--ln);border-radius:8px;padding:14px}
+.q{display:flex;align-items:center;gap:10px;padding:9px 6px;border-radius:6px;border:1px solid transparent}
+.q:hover{background:rgba(167,139,250,.05)}
+.q .nm{flex:0 0 168px;font-size:12.5px;font-weight:700;color:#dcd9f0}
+.q .nm span{display:block;font-size:9px;font-weight:400;color:var(--gy);letter-spacing:1px;
+  text-transform:uppercase;margin-top:3px;line-height:1.35}
+.qbar{flex:1;height:20px;background:#101019;border:1px solid var(--ln);border-radius:4px;position:relative;
+  overflow:hidden;min-width:70px}
+.qbar i{position:absolute;left:0;top:0;bottom:0}
+.qbar u{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.45)}
+.qbar b{position:absolute;right:6px;line-height:20px;font-size:11px;font-family:monospace;
+  font-weight:700;color:#e9e9f2;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.q .rt{flex:0 0 78px;text-align:right;font-family:monospace;font-size:13px}
+.q .rt span{display:block;font-size:9.5px;color:var(--gy);font-family:Helvetica,Arial,sans-serif}
+.clock{display:flex;gap:3px;margin-top:10px}
+.clock div{flex:1;height:26px;border-radius:3px;position:relative;font-size:9px;font-family:monospace;
+  display:flex;align-items:center;justify-content:center;color:#0b0b12;font-weight:700}
+.cmp{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:stretch}
+@media(max-width:600px){.cmp{grid-template-columns:1fr}.cmp .mid{display:none}}
+.side{padding:12px 14px;border-radius:8px;border:1px solid var(--ln)}
+.before{background:#1a1218;border-color:#3a2430}
+.after{background:#101d18;border-color:#1f3d33}
+.side .cl{font-size:9px;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:9px}
+.before .cl{color:var(--rd)} .after .cl{color:var(--gn)}
+.side .cv{font-size:21px;font-weight:800;font-family:monospace}
+.side .cs{font-size:10.5px;color:var(--gy);margin-top:7px;line-height:1.6}
+.mid{display:flex;align-items:center;font-size:20px;color:#3a3a55}
+.txt{font-size:11.5px;color:#8b8fa3;line-height:1.7}
+.note{border-radius:4px;padding:12px 15px;margin:0 16px;border:1px solid #1f3d33;
+  border-left:3px solid var(--gn);background:#101d18}
+.note b{font-size:9px;letter-spacing:1.6px;text-transform:uppercase;color:var(--gn);display:block}
+.note p{color:#8b8fa3;font-size:11.5px;margin:6px 0 0;line-height:1.65}
+.ft{padding:10px 16px 14px;font-size:9px;color:#3c3c52;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wf">
+  <div class="hd">
+    <div><h1>Claims Routing Console</h1>
+      <div class="sb">Skill based distribution out of the reporting platform &middot; open queue</div></div>
+    <div class="tog" id="tog">
+      <button data-v="after" class="on">Routed</button>
+      <button data-v="before">Manual</button>
+    </div>
+  </div>
+
+  <div class="kpi" id="kpi"></div>
+
+  <div class="sec">
+    <div class="pt">Days against the 30 day statutory clock &middot; every open claim, bucketed</div>
+    <div class="clock" id="clock"></div>
+  </div>
+
+  <div class="main">
+    <div class="pnl">
+      <div class="pt">Specialty queues &middot; a claim can only be worked by a processor certified for it</div>
+      <div id="queues"></div>
+      <div class="pt" style="margin-top:16px">How routing works</div>
+      <div class="txt">
+        Every claim needing manual intervention carries a diagnosis code, a dollar value, a provider
+        type and a plan. The platform reads those, matches them to the certification each processor
+        actually holds, ranks what is left by days remaining on the statutory clock, and pushes each
+        processor a personal worklist through distribution services. A processor opens their list and
+        everything on it is theirs to work. Nothing arrives that they are not allowed to touch.
+      </div>
+    </div>
+
+    <div class="pnl">
+      <div class="pt">What changed</div>
+      <div class="cmp" id="cmp"></div>
+      <div class="pt" style="margin-top:16px">Why the BI platform did this</div>
+      <div class="txt">
+        The vendor demonstrated their own application for this. Everything it needed already lived in
+        the warehouse behind the claims reporting: the open queue, the codes, the dollar values, the
+        plan rules and the processor certifications. Distribution services were built to push a report
+        to the right person on a schedule, and a worklist is a report with a name on it. Using them to
+        assign work is not what the tool was designed for, but it is squarely what the tool is good at,
+        and it shipped in days rather than in a procurement cycle.
+      </div>
+    </div>
+  </div>
+
+  <div class="note"><b>Outcome</b><p id="outcome"></p></div>
+
+  <div class="ft">
+    Sample data shaped to a real operation. The statutory clock is 30 days from receipt, after which the
+    plan pays a penalty &middot; a mis-routed open is a processor opening a claim they are not certified
+    to work and putting it back &middot; queues are certifications, not teams: a processor can hold more
+    than one &middot; time to close is receipt to final determination.
+  </div>
+</div>
+<script>
+var VIEW='after';
+
+var QUEUES=[
+  {n:'Medical review',    d:'diagnosis coded, clinical judgement', proc:6, aft:118, bef:96,  agedA:6,  agedB:22},
+  {n:'High dollar',       d:'over one million, second signature',  proc:3, aft:24,  bef:19,  agedA:2,  agedB:11},
+  {n:'Chiropractic',      d:'visit limits and frequency rules',    proc:4, aft:86,  bef:71,  agedA:3,  agedB:18},
+  {n:'Dental and vision', d:'separate schedule of benefits',       proc:4, aft:74,  bef:58,  agedA:2,  agedB:14},
+  {n:'Out of network',    d:'balance billing, negotiated rate',    proc:3, aft:61,  bef:44,  agedA:4,  agedB:19},
+  {n:'Coordination',      d:'two plans, order of payment',         proc:3, aft:48,  bef:37,  agedA:3,  agedB:16},
+  {n:'Appeals',           d:'previously denied, on the clock',     proc:2, aft:31,  bef:24,  agedA:1,  agedB:13}
+];
+
+var D={
+  after:{ close:9.6, misroute:0, penalty:0, mgrs:0,
+    clock:[{l:'0-5',v:186,c:'#34d399'},{l:'6-10',v:171,c:'#34d399'},{l:'11-15',v:58,c:'#a78bfa'},
+           {l:'16-20',v:19,c:'#a78bfa'},{l:'21-25',v:6,c:'#fbbf24'},{l:'26-30',v:2,c:'#fbbf24'},
+           {l:'over 30',v:0,c:'#fb7185'}] },
+  before:{ close:31.4, misroute:38, penalty:64, mgrs:2,
+    clock:[{l:'0-5',v:41,c:'#34d399'},{l:'6-10',v:52,c:'#34d399'},{l:'11-15',v:63,c:'#a78bfa'},
+           {l:'16-20',v:71,c:'#a78bfa'},{l:'21-25',v:79,c:'#fbbf24'},{l:'26-30',v:70,c:'#fbbf24'},
+           {l:'over 30',v:64,c:'#fb7185'}] }
+};
+
+function render(){
+  var d=D[VIEW], a=D.after, b=D.before;
+  var open=QUEUES.reduce(function(s,q){return s+(VIEW==='after'?q.aft:q.bef);},0);
+  var aged=QUEUES.reduce(function(s,q){return s+(VIEW==='after'?q.agedA:q.agedB);},0);
+
+  document.getElementById('kpi').innerHTML =
+    '<div class="k '+(d.close<30?'g':'r')+'"><div class="l">Time to close</div>'+
+      '<div class="v" style="color:'+(d.close<30?'#34d399':'#fb7185')+'">'+d.close.toFixed(1)+'</div>'+
+      '<div class="s">days, receipt to determination</div>'+
+      (VIEW==='after'?'<div class="d" style="color:#34d399">▼ from '+b.close.toFixed(1)+
+        ', inside the 30 day clock</div>':
+        '<div class="d" style="color:#fb7185">▲ past the 30 day clock</div>')+'</div>'+
+    '<div class="k '+(d.penalty?'r':'g')+'"><div class="l">Past the clock</div>'+
+      '<div class="v" style="color:'+(d.penalty?'#fb7185':'#34d399')+'">'+d.penalty+'</div>'+
+      '<div class="s">claims over 30 days, each one a penalty</div></div>'+
+    '<div class="k '+(d.misroute?'a':'g')+'"><div class="l">Mis-routed opens</div>'+
+      '<div class="v" style="color:'+(d.misroute?'#fbbf24':'#34d399')+'">'+d.misroute+'%</div>'+
+      '<div class="s">'+(d.misroute?'opened by someone not certified for it':
+        'a processor only sees what they can work')+'</div></div>'+
+    '<div class="k '+(d.mgrs?'a':'g')+'"><div class="l">Managers sorting</div>'+
+      '<div class="v" style="color:'+(d.mgrs?'#fbbf24':'#34d399')+'">'+d.mgrs+'</div>'+
+      '<div class="s">'+(d.mgrs?'full time, dividing the pile by hand':
+        'both moved to higher value work')+'</div></div>'+
+    '<div class="k"><div class="l">Open queue</div><div class="v" style="color:#a78bfa">'+open+
+      '</div><div class="s">'+aged+' of them near the deadline</div></div>';
+
+  var max=Math.max.apply(null,d.clock.map(function(c){return c.v;}));
+  document.getElementById('clock').innerHTML = d.clock.map(function(c){
+    var w=max?Math.max(c.v/max,0.06):0.06;
+    return '<div style="background:'+c.c+';opacity:'+(0.25+w*0.6).toFixed(2)+
+      '"><span style="color:#0b0b12">'+c.l+' d &middot; '+c.v+'</span></div>';
+  }).join('');
+
+  document.getElementById('queues').innerHTML = QUEUES.map(function(q){
+    var v=VIEW==='after'?q.aft:q.bef, ag=VIEW==='after'?q.agedA:q.agedB;
+    var per=v/q.proc, pct=Math.min(per/45,1)*100;
+    var c = VIEW==='after' ? '#34d399' : (ag>15?'#fb7185':'#fbbf24');
+    return '<div class="q"><div class="nm">'+q.n+'<span>'+q.d+'</span></div>'+
+      '<div class="qbar"><i style="width:'+pct.toFixed(1)+'%;background:'+c+';opacity:.55"></i>'+
+      '<b>'+v+'</b></div>'+
+      '<div class="rt" style="color:'+(ag>10?'#fb7185':'#c9c5e0')+'">'+ag+
+      '<span>near deadline</span></div></div>';
+  }).join('');
+
+  document.getElementById('cmp').innerHTML =
+    '<div class="side before"><div class="cl">Manual</div>'+
+      '<div class="cv" style="color:#fb7185">'+b.close.toFixed(1)+' days</div>'+
+      '<div class="cs">Two managers split the pile by hand every morning. Processors opened claims, '+
+      'found a diagnosis or a dollar value they were not certified for, and put them back. Half a day '+
+      'could go into reading claims that were never theirs to work, and the oldest claim was rarely '+
+      'the next one opened.</div></div>'+
+    '<div class="mid">&#8594;</div>'+
+    '<div class="side after"><div class="cl">Routed</div>'+
+      '<div class="cv" style="color:#34d399">'+a.close.toFixed(1)+' days</div>'+
+      '<div class="cs">The platform matches each claim to the certifications that can work it, orders '+
+      'by days left on the clock, and delivers a personal worklist. Nothing arrives on a desk that the '+
+      'person cannot action, and both managers went to work that actually needed a manager.</div></div>';
+
+  document.getElementById('outcome').textContent =
+    'Claims routing was built on the reporting platform rather than the vendor application that was '+
+    'demonstrated for it. Time to close went from over 30 days to under 10, which ended the penalties '+
+    'for missing the statutory deadline, and the two managers who had been dividing the pile by hand '+
+    'moved to higher value work. More than one million dollars, on a build measured in days.';
+}
+[].forEach.call(document.querySelectorAll('#tog button'), function(b){
+  b.onclick=function(){ VIEW=b.getAttribute('data-v');
+    [].forEach.call(document.querySelectorAll('#tog button'),function(x){x.classList.remove('on');});
+    b.classList.add('on'); render(); };
+});
+render();
+</script>
+</body>
+</html>
