@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Demand Intraday Performance</title>
+<style>
+html,body{margin:0;padding:0;background:#0b1220}
+body{padding:16px;font-family:Arial,Helvetica,sans-serif}
+.diip{background:#0b1220;color:#dde9fd;max-width:100%}
+.hdr{background:linear-gradient(90deg,#0e1c38,#111e33);padding:14px 16px;border-bottom:1px solid #1d3253;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.hdr-t{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.hdr-s{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#6b87a8;margin-top:4px}
+.daysel{display:flex;gap:0}
+.daysel button{background:transparent;border:1px solid #1d3253;border-right:none;color:#6b87a8;
+  padding:8px 14px;font-size:10px;letter-spacing:1.4px;cursor:pointer;font-weight:700;
+  font-family:inherit;text-transform:uppercase;transition:.15s}
+.daysel button:last-child{border-right:1px solid #1d3253}
+.daysel button.on{background:#fff;color:#0b1220;border-color:#fff}
+.daysel button:hover:not(.on){color:#c8d8f0}
+
+.kr{display:flex;flex-wrap:wrap;gap:10px;padding:14px 16px}
+.kt{flex:1 1 180px;min-width:0;background:#111e33;border:1px solid #1d3253;border-radius:8px;
+  padding:12px 14px;border-top-width:2px}
+.kt.b1{border-top-color:#2b6be4;background:linear-gradient(180deg,rgba(43,107,228,.18),rgba(17,30,51,0) 58%),#111e33}
+.kt.b2{border-top-color:#10b981;background:linear-gradient(180deg,rgba(16,185,129,.18),rgba(17,30,51,0) 58%),#111e33}
+.kt.b3{border-top-color:#a78bfa;background:linear-gradient(180deg,rgba(167,139,250,.18),rgba(17,30,51,0) 58%),#111e33}
+.kt.b4{border-top-color:#f59e0b;background:linear-gradient(180deg,rgba(245,158,11,.18),rgba(17,30,51,0) 58%),#111e33}
+.kl{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#6b87a8;margin-bottom:6px}
+.kv{font-size:26px;font-weight:800;font-family:monospace;letter-spacing:-1px;margin:6px 0 4px}
+.ks{font-size:12px;color:#6b87a8}
+
+.gw{padding:0 16px 16px}
+.gl{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#6b87a8;padding:10px 0;border-top:1px solid #1d3253}
+.ht{width:100%;border-collapse:collapse;table-layout:fixed}
+.ht thead tr{background:#0e1928}
+.ht thead th{padding:10px;font-size:12px;font-weight:700;text-transform:uppercase;color:#6b87a8;
+  text-align:right;border-bottom:1px solid #1d3253;white-space:nowrap}
+.ht thead th:first-child{text-align:left}
+.ht thead th:nth-child(2),.ht thead th:nth-child(3){text-align:center}
+.ht tbody tr{border-bottom:1px solid rgba(29,50,83,.35)}
+.ht tbody tr:hover{background:rgba(43,107,228,.05)}
+.ht td{padding:8px 10px;font-size:11px;font-family:monospace;text-align:right;color:#8aadcc;
+  white-space:nowrap;vertical-align:middle;font-variant-numeric:tabular-nums}
+.ht td:first-child{text-align:left;font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:700;color:#c8d8f0}
+.ht td:nth-child(2),.ht td:nth-child(3){text-align:center}
+.bl{border-left:1px solid #1d3253}
+.ty{font-size:19px;font-weight:800;font-family:monospace;color:#dde9fd;line-height:1.2}
+.yv{font-size:14px;font-weight:700;line-height:1.2}
+.lv{font-size:11px;color:#6b87a8;line-height:1.2}
+.bu,.bd,.bz{display:inline-block;padding:4px 12px;border-radius:10px;font-size:13px;font-weight:700}
+.bu{background:rgba(16,185,129,.13);color:#10b981}
+.bd{background:rgba(244,63,94,.13);color:#f43f5e}
+.bz{background:rgba(148,163,184,.08);color:#64748b}
+.pchip,.nchip{display:inline-block;font-size:8px;letter-spacing:.5px;text-transform:uppercase;
+  border-radius:6px;padding:1px 5px;margin-left:6px;vertical-align:middle;font-weight:700}
+.pchip{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
+.nchip{background:rgba(167,139,250,.14);color:#a78bfa;border:1px solid rgba(167,139,250,.3)}
+.live{font-size:7px;background:#2b6be4;color:#fff;padding:1px 4px;border-radius:6px;
+  vertical-align:middle;margin-left:4px}
+.spark{display:block}
+
+.tw{position:relative;display:inline-block;cursor:help;border-bottom:1px dotted #6b87a8;transition:color .15s}
+.tw:hover{color:#dbe7fb}
+.tw.tipx{border-bottom:none}
+.tw .tt{display:none;position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);
+  background:linear-gradient(158deg,rgba(74,86,124,.74),rgba(32,39,60,.68));
+  border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:13px 15px;
+  font-size:11.5px;font-weight:400;text-transform:none;letter-spacing:0;color:#e2e7f2;
+  width:286px;text-align:left;z-index:400;line-height:1.65;white-space:normal;pointer-events:none;
+  text-shadow:0 1px 2px rgba(0,0,0,.45);
+  box-shadow:0 22px 52px rgba(0,0,0,.58),0 2px 8px rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,255,255,.16),inset 0 -1px 0 rgba(0,0,0,.18);
+  -webkit-backdrop-filter:blur(22px) saturate(185%);backdrop-filter:blur(22px) saturate(185%)}
+.tw .tt b{display:block;color:#fff;font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;
+  margin-bottom:7px;font-weight:700}
+.tw .tt u{display:block;text-decoration:none;color:#fff;font-weight:600;margin-bottom:8px;
+  padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.14)}
+.tw:hover .tt{display:block}
+.tw.tipl .tt{left:-6px;transform:none}
+.tw.tipr .tt{left:auto;right:-6px;transform:none}
+.tiparw{position:absolute;top:-6px;left:50%;margin-left:-6px;width:12px;height:12px;
+  background:rgba(70,82,119,.72);border-left:1px solid rgba(255,255,255,.18);
+  border-top:1px solid rgba(255,255,255,.18);transform:rotate(45deg);border-radius:2px 0 0 0}
+.tipl .tiparw{left:26px;margin-left:0}
+.tipr .tiparw{left:auto;right:26px;margin-left:0}
+@supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+  .tw .tt{background:linear-gradient(158deg,rgba(48,57,84,.99),rgba(28,34,52,.99))}
+  .tiparw{background:rgba(52,62,92,.99)}}
+
+.cl{border-radius:4px;padding:12px 15px;margin-top:12px;border:1px solid;border-left-width:3px}
+.cl.g{background:#101a15;border-color:#1d3a2d;border-left-color:#35d07f}
+.cl.w{background:#1a1510;border-color:#3a3020;border-left-color:#f59e0b}
+.cl b{font-size:9px;letter-spacing:1.6px;text-transform:uppercase;display:block}
+.cl.g b{color:#35d07f}
+.cl.w b{color:#f59e0b}
+.cl p{color:#8b909e;font-size:11.5px;margin:6px 0 0;line-height:1.65}
+.lgd{margin:12px 0 4px;font-size:12px;color:#8aadcc}
+.lgd summary{cursor:pointer;color:#6b87a8;font-size:11px;text-transform:uppercase;letter-spacing:1px;
+  padding:6px 0;user-select:none}
+.lgi{padding:5px 0 5px 12px;line-height:1.55;border-left:2px solid #1d3253;margin:4px 0}
+.lgi b{color:#c8d8f0}
+.ft{padding:8px 0 12px;font-size:9px;color:#2d4463;border-top:1px solid #0a1020;line-height:1.7}
+.hg{display:inline-block;font-size:13px;animation:hgflip 2.4s ease-in-out infinite}
+@keyframes hgflip{0%,55%{transform:rotate(0)}75%,100%{transform:rotate(180deg)}}
+@media(max-width:600px){.kt{flex:1 1 calc(50% - 5px)}.kv{font-size:20px}}
+@media(max-width:500px){.hm{display:none!important}.ht{table-layout:auto}}
+</style>
+</head>
+<body>
+<div class="diip">
+  <div class="hdr">
+    <div>
+      <div class="hdr-t"><span class="tw tipl">Demand Intraday Performance<span class="tt"><i class="tiparw"></i>
+        <b>About this report</b><u>Marketplace demand hour by hour, today against the same day last year</u>
+        It covers today and the previous days, and it rebuilds every time you open it. Demand is the gross
+        booked dollar value of orders as they land in the order system, with returns taken out.</span></span></div>
+      <div class="hdr-s" id="subhdr"></div>
+    </div>
+    <div class="daysel" id="daysel"></div>
+  </div>
+  <div class="kr" id="kpis"></div>
+  <div class="gw">
+    <div class="gl" id="gridlabel"></div>
+    <table class="ht">
+      <thead><tr>
+        <th style="text-align:left;width:9%"><span class="tw tipl">Hour<span class="tt"><i class="tiparw"></i>
+          <b>Hour</b><u>Each row covers the 60 minutes ENDING at the time shown</u>
+          Up to 9 AM means 8:00 through 8:59. The hour in progress appears only once orders land in it,
+          so nothing here is a partial hour dressed up as a finished one.</span></span></th>
+        <th style="text-align:center;width:20%"><span class="tw">TY vs LY &middot; Running Total<span class="tt"><i class="tiparw"></i>
+          <b>Running Total</b><u>Cumulative from midnight through this hour</u>
+          Every row includes all prior hours. The arrow is the percent against the comparable day last
+          year at the same point.</span></span></th>
+        <th class="bl hm" style="text-align:center;width:19%"><span class="tw">This Hour Only<span class="tt"><i class="tiparw"></i>
+          <b>This Hour Only</b><u>Demand booked inside this single hour, not cumulative</u>
+          The middle line is the dollar difference against the same hour last year, green when today
+          beat it.</span></span></th>
+        <th class="hm" style="width:11%"><span class="tw">Hrly YOY%<span class="tt"><i class="tiparw"></i>
+          <b>Hourly YOY%</b><u>Year over year for this one hour of new demand</u>
+          It can be green while the day total is still red, which means the recovery has already
+          started.</span></span></th>
+        <th class="hm" style="width:13%"><span class="tw">Momentum<span class="tt"><i class="tiparw"></i>
+          <b>Momentum</b><u>Change in the day YOY% versus the previous hour</u>
+          Up means the day is extending its lead or closing the gap, down means the advantage is
+          shrinking.</span></span></th>
+        <th class="hm" style="width:14%"><span class="tw">Shape<span class="tt"><i class="tiparw"></i>
+          <b>Shape</b><u>The last eight hours of demand, this year against last</u>
+          Bars are this year, the faint line behind is last year at the same hours. It answers
+          "is this hour part of a trend or a blip" without leaving the row.</span></span></th>
+        <th class="bl" style="width:14%"><span class="tw tipr">% of LY Day<span class="tt"><i class="tiparw"></i>
+          <b>Percent of LY Day</b><u>Today running total against last year FULL day</u>
+          The amber fill behind the number is the same figure drawn as a progress bar. Crossing 100%
+          means today already beat that entire day last year.</span></span></th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div id="callouts"></div>
+    <details class="lgd"><summary>What do these columns mean?</summary>
+      <div class="lgi"><b>Hour</b> &mdash; every row covers the 60 minutes ENDING at the time shown, so Up to 9 AM is 8:00 through 8:59.</div>
+      <div class="lgi"><b>TY vs LY &middot; Running Total</b> &mdash; cumulative demand from midnight through each hour, against the comparable day last year at the same point.</div>
+      <div class="lgi"><b>This Hour Only</b> &mdash; demand from that single hour, not cumulative, with the dollar difference against the same hour last year.</div>
+      <div class="lgi"><b>Hrly YOY%</b> &mdash; year over year for that single hour. A run of green rows is the earliest signal of a turn.</div>
+      <div class="lgi"><b>Momentum</b> &mdash; change in the cumulative YOY% versus the prior hour.</div>
+      <div class="lgi"><b>Shape</b> &mdash; the last eight hours of hourly demand, this year as bars and last year as the faint line behind them.</div>
+      <div class="lgi"><b>% of LY Day</b> &mdash; how far along today is toward beating the comparable day's full total. Crossing 100% means today beat that entire day.</div>
+    </details>
+    <div class="ft">
+      Marketplace orders only, returns excluded &middot; YOY% is cumulative demand &middot;
+      Hrly YOY% is the incremental hour only &middot; Momentum = cumulative YOY% delta vs prior hour &middot;
+      Pace % = TY against the LY comparable day end-of-day total &middot; LY = retail-calendar comparable day &middot;
+      hours are labelled Up to, so Up to 9 AM covers 8:00 to 8:59 &middot;
+      orders import 1 to 3 hours after they are placed, so the newest hours fill in late.<br>
+      Sample data, shaped to a real retail curve. Design and logic are the work; the numbers are illustrative.
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- synthetic demand curve: overnight trough, midday plateau, evening peak ---------- */
+var SHAPE = [.028,.014,.009,.007,.008,.013,.024,.038,.049,.055,.058,.060,
+             .062,.061,.058,.056,.058,.064,.075,.086,.081,.062,.043,.031];
+
+function buildDay(opts){
+  var ty=[], ly=[], i;
+  for(i=0;i<24;i++){
+    var wob = 1 + Math.sin(i*2.1 + opts.seed)*0.10;
+    ty.push(Math.round(SHAPE[i]*opts.tyTotal*wob));
+    ly.push(Math.round(SHAPE[i]*opts.lyTotal*(1 + Math.sin(i*1.7 + opts.seed+1)*0.12)));
+  }
+  return {label:opts.label, date:opts.date, tyH:ty, lyH:ly,
+          lyFinal:ly.reduce(function(a,b){return a+b;},0),
+          lastHour:opts.lastHour, awaiting:opts.awaiting, settleFrom:opts.settleFrom};
+}
+
+var DAYS = [
+  buildDay({label:'LATEST', date:'Mon 08/17/2026', tyTotal:196000, lyTotal:92000,
+            seed:0.4, lastHour:9, awaiting:true, settleFrom:8}),
+  buildDay({label:'08/16', date:'Sun 08/16/2026', tyTotal:189495, lyTotal:89195,
+            seed:1.3, lastHour:23, awaiting:false, settleFrom:99}),
+  buildDay({label:'08/15', date:'Sat 08/15/2026', tyTotal:174200, lyTotal:96400,
+            seed:2.2, lastHour:23, awaiting:false, settleFrom:99})
+];
+
+var money = function(v){ return '$' + Math.round(v).toLocaleString('en-US'); };
+var pct = function(v,d){ return (v>=0?'+':'') + (v*100).toFixed(d===undefined?1:d) + '%'; };
+
+function hourLabel(h){
+  var e=(h+1)%24, t=e%12===0?12:e%12;
+  return 'Up to ' + t + ' ' + (e<12?'AM':'PM');
+}
+function clockLabel(h){
+  var e=(h+1)%24, t=e%12===0?12:e%12;
+  return t + ' ' + (e<12?'AM':'PM');
+}
+
+/* eight-hour sparkline: TY as bars, LY as the faint line behind */
+function spark(tyH, lyH, upto){
+  var start=Math.max(0,upto-7), i, w=76, h=26, n=upto-start+1;
+  var vals=[], lvals=[];
+  for(i=start;i<=upto;i++){ vals.push(tyH[i]); lvals.push(lyH[i]); }
+  var max=Math.max.apply(null, vals.concat(lvals)) || 1;
+  var bw=w/n, s='<svg class="spark" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'">';
+  var pts=[];
+  for(i=0;i<n;i++){
+    var bh=Math.max(1, vals[i]/max*(h-4));
+    var col = vals[i]>=lvals[i] ? '#10b981' : '#f43f5e';
+    var op  = i===n-1 ? '1' : '.55';
+    s+='<rect x="'+(i*bw+1).toFixed(1)+'" y="'+(h-bh).toFixed(1)+'" width="'+(bw-2).toFixed(1)+
+       '" height="'+bh.toFixed(1)+'" fill="'+col+'" opacity="'+op+'" rx="1"/>';
+    pts.push(((i*bw)+bw/2).toFixed(1)+','+(h-Math.max(1,lvals[i]/max*(h-4))).toFixed(1));
+  }
+  if(n >= 3){
+    s+='<polyline points="'+pts.join(' ')+'" fill="none" stroke="#6b87a8" stroke-width="1" opacity=".7"/>';
+  }
+  return s+'</svg>';
+}
+
+var cur = 0;
+
+function render(){
+  var d = DAYS[cur], i;
+  var tyCum=[], lyCum=[], a=0, b=0;
+  for(i=0;i<24;i++){ a+=d.tyH[i]; b+=d.lyH[i]; tyCum.push(a); lyCum.push(b); }
+
+  var last = d.lastHour;
+  var yoyAt = function(h){ return lyCum[h] ? (tyCum[h]-lyCum[h])/lyCum[h] : null; };
+
+  /* day selector */
+  document.getElementById('daysel').innerHTML = DAYS.map(function(x,k){
+    return '<button class="'+(k===cur?'on':'')+'" data-k="'+k+'">'+x.label+'</button>';
+  }).join('');
+  [].forEach.call(document.querySelectorAll('.daysel button'), function(btn){
+    btn.onclick = function(){ cur = +btn.getAttribute('data-k'); render(); };
+  });
+
+  var inProgress = d.awaiting;
+  document.getElementById('subhdr').textContent =
+    'MARKETPLACE · TY VS LY · ' + d.date.toUpperCase() + ' · ' +
+    (inProgress ? 'DATA THRU ' + clockLabel(last) : 'COMPLETE DAY');
+
+  /* momentum uses the newest SETTLED hour only */
+  var mHour = last;
+  while(mHour > 0 && mHour >= d.settleFrom) mHour--;
+  var mom = (mHour>0 && yoyAt(mHour)!==null && yoyAt(mHour-1)!==null)
+            ? yoyAt(mHour)-yoyAt(mHour-1) : null;
+
+  var dayYoy = yoyAt(last), pace = tyCum[last]/d.lyFinal;
+
+  document.getElementById('kpis').innerHTML =
+    '<div class="kt b1"><div class="kl"><span class="tw tipl">Cumulative TY<span class="tt"><i class="tiparw"></i>'+
+      '<b>Cumulative TY</b><u>Every dollar booked today, midnight to the hour shown</u>'+
+      'A running total, not the latest hour on its own.</span></span></div>'+
+      '<div class="kv" style="color:#60a5fa">'+money(tyCum[last])+'</div>'+
+      '<div class="ks">LY: '+money(lyCum[last])+'</div>'+
+      '<div class="ks" style="color:#2d4a6a;margin-top:2px">'+
+      (inProgress?'Data thru '+clockLabel(last):'Final')+'</div></div>'+
+    '<div class="kt b2"><div class="kl"><span class="tw">Day YOY%<span class="tt"><i class="tiparw"></i>'+
+      '<b>Day YOY%</b><u>Today so far against the same point last year</u>'+
+      'Green means ahead of last year, red means behind.</span></span></div>'+
+      '<div class="kv" style="color:'+(dayYoy>=0?'#10b981':'#f43f5e')+'">'+
+      (dayYoy>=0?'▲ ':'▼ ')+pct(dayYoy)+'</div>'+
+      '<div class="ks">Cumulative vs LY</div></div>'+
+    '<div class="kt b3"><div class="kl"><span class="tw">YOY Momentum<span class="tt"><i class="tiparw"></i>'+
+      '<b>YOY Momentum</b><u>Is the gap to last year getting better or worse?</u>'+
+      'This tile deliberately skips any hour still receiving orders, because a half-loaded hour '+
+      'always looks like a slowdown. It reads the newest settled hour and names it underneath.'+
+      '</span></span><span class="nchip">complete hours</span></div>'+
+      '<div class="kv" style="color:#a78bfa">'+(mom===null?'—':pct(mom))+'</div>'+
+      '<div class="ks">'+(mom===null?'Waiting on the first settled hour':
+        (mom>0?'▲ Building vs prior hour':'▼ Fading vs prior hour'))+'</div>'+
+      '<div class="ks" style="color:#2d4a6a;margin-top:2px">'+
+      (mom===null?'':'Through '+clockLabel(mHour)+', last complete hour')+'</div></div>'+
+    '<div class="kt b4"><div class="kl"><span class="tw tipr">Pace vs LY Final<span class="tt"><i class="tiparw"></i>'+
+      '<b>Pace vs LY Final</b><u>How far along toward beating last year entire day</u>'+
+      'It only grows through the day. Crossing 100% means today already beat that whole day.'+
+      '</span></span></div>'+
+      '<div class="kv" style="color:#f59e0b">'+(pace*100).toFixed(1)+'%</div>'+
+      '<div class="ks">TY vs LY full-day total</div></div>';
+
+  document.getElementById('gridlabel').textContent =
+    'HOURLY DETAIL · ' + d.date + ' · NEWEST HOUR FIRST · GREEN BORDER = TY AHEAD · RED BORDER = TY BEHIND';
+
+  /* rows, newest first */
+  var html = '';
+  if(d.awaiting){
+    html += '<tr style="opacity:.75"><td style="border-left:2px solid rgba(245,158,11,.55)">'+
+      hourLabel(last+1)+'</td><td colspan="6" style="text-align:center;color:#f59e0b;font-size:11px;'+
+      'letter-spacing:1px">'+
+      '<span class="hg">⌛</span> AWAITING DATA · orders take 1 to 3 hours to reach the order system</td></tr>';
+  }
+  for(i=last;i>=0;i--){
+    var y = yoyAt(i);
+    var hy = d.lyH[i] ? (d.tyH[i]-d.lyH[i])/d.lyH[i] : null;
+    var mo = (i>0 && yoyAt(i-1)!==null) ? y-yoyAt(i-1) : null;
+    var diff = d.tyH[i]-d.lyH[i];
+    var pc = tyCum[i]/d.lyFinal;
+    var settling = i>=d.settleFrom;
+    var live = d.awaiting && i===last;
+    var bg = function(v){ return v===null?'':'background:rgba('+(v>=0?'16,185,129':'244,63,94')+','+
+             (Math.min(Math.abs(v),.5)/.5*.2).toFixed(3)+');'; };
+
+    html += '<tr'+(live?' style="background:rgba(43,107,228,.08)"':'')+'>'+
+      '<td style="border-left:2px solid '+(y>=0?'rgba(16,185,129,.5)':'rgba(244,63,94,.5)')+'">'+
+        hourLabel(i)+
+        (settling?' <span class="pchip">partial</span>':'')+
+        (live?' <span class="live">LIVE</span>':'')+'</td>'+
+      '<td style="'+bg(y)+'"><div class="ty">'+money(tyCum[i])+'</div>'+
+        '<div class="yv" style="color:'+(y>=0?'#10b981':'#f43f5e')+'">'+(y>=0?'▲ ':'▼ ')+pct(y)+'</div>'+
+        '<div class="lv">LY '+money(lyCum[i])+'</div></td>'+
+      '<td class="bl hm" style="'+bg(hy)+'">'+
+        (settling?'<span class="tw tipx">':'')+
+        '<div class="ty">'+money(d.tyH[i])+'</div>'+
+        '<div class="yv" style="color:'+(diff>=0?'#10b981':'#f43f5e')+'">'+(diff>=0?'▲ ':'▼ ')+
+        (diff>=0?money(diff):'('+money(Math.abs(diff))+')')+'</div>'+
+        '<div class="lv">LY '+money(d.lyH[i])+'</div>'+
+        (settling?'<span class="tt"><i class="tiparw"></i><b>Still filling in</b><u>'+
+          'This hour is not final yet</u>Orders reach the order system 1 to 3 hours after a shopper '+
+          'places them. A soft number here is usually an unfinished hour rather than a real slowdown, '+
+          'and it corrects itself once the rest land.</span></span>':'')+'</td>'+
+      '<td class="hm" style="font-size:16px;font-weight:700;'+bg(hy)+'color:'+
+        (hy>=0?'#10b981':'#f43f5e')+'">'+(hy===null?'—':pct(hy))+'</td>'+
+      '<td class="hm">'+(mo===null?'—':
+        '<span class="'+(Math.abs(mo)<.0005?'bz':(mo>0?'bu':'bd'))+'">'+
+        (Math.abs(mo)<.0005?'0.0%':(mo>0?'▲ ':'▼ ')+pct(Math.abs(mo)).replace('+',''))+'</span>')+'</td>'+
+      '<td class="hm">'+spark(d.tyH, d.lyH, i)+'</td>'+
+      '<td class="bl" style="font-size:16px;font-weight:700;color:#f59e0b;'+
+        'background:linear-gradient(to right,rgba(245,158,11,.12) '+Math.min(pc*100,100).toFixed(1)+
+        '%,transparent '+Math.min(pc*100,100).toFixed(1)+'%)">'+(pc*100).toFixed(1)+'%</td>'+
+      '</tr>';
+  }
+  document.getElementById('rows').innerHTML = html;
+
+  document.getElementById('callouts').innerHTML =
+    '<div class="cl g"><b>Summary</b><p>Marketplace demand has booked '+money(tyCum[last])+
+    ' through '+clockLabel(last)+', against '+money(lyCum[last])+' at the same point last year ('+
+    pct(dayYoy)+'). That is '+(pace*100).toFixed(1)+'% of what the comparable day delivered in full.</p></div>'+
+    '<div class="cl w"><b>Note</b><p>Orders reach the order system 1 to 3 hours after they are placed, '+
+    'so the newest hours are marked Awaiting Data rather than shown as zero. An hour appears on this '+
+    'grid only once it has finished, which is why the hour currently in progress is absent until its '+
+    'first orders land. Every hour label reads Up to, so Up to 9 AM covers 8:00 through 8:59.</p></div>';
+}
+render();
+</script>
+</body>
+</html>
