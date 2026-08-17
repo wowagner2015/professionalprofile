@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Will Wagner - Senior Analytics Engineer</title>
+<style>
+:root{
+  --bg:#0e0f13; --card:#191b21; --line:#2a2d36;
+  --txt:#ffffff; --dim:#9aa0ac; --mute:#6b7280;
+  --red:#e50914; --blue:#4da3ff; --green:#3dd68c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--txt);
+  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;overflow:hidden}
+#stage{position:relative;height:100vh;width:100vw}
+.slide{position:absolute;inset:0;padding:5vh 5vw;display:none;
+  flex-direction:column;animation:fade .35s ease}
+.slide.on{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+h1{font-size:clamp(28px,3.6vw,52px);font-weight:700;letter-spacing:-.5px;line-height:1.1}
+h2{font-size:clamp(22px,2.6vw,38px);font-weight:700;letter-spacing:-.3px;line-height:1.15}
+.sub{color:var(--dim);font-size:clamp(13px,1.15vw,17px);margin-top:10px;letter-spacing:.2px}
+.kicker{color:var(--red);font-size:clamp(10px,.85vw,13px);letter-spacing:3px;
+  text-transform:uppercase;font-weight:700;margin-bottom:14px}
+.body{color:var(--dim);font-size:clamp(12px,1.05vw,15px);line-height:1.65}
+
+.cards{display:grid;gap:clamp(14px,1.6vw,26px);margin-top:auto;margin-bottom:auto}
+.c3{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+  padding:clamp(16px,1.7vw,26px)}
+.card .lab{font-size:clamp(9px,.72vw,11px);letter-spacing:2.4px;font-weight:700;
+  text-transform:uppercase;margin-bottom:10px}
+.card h3{font-size:clamp(15px,1.35vw,21px);font-weight:700;margin-bottom:12px}
+
+.rows{margin-top:auto;margin-bottom:auto;display:flex;flex-direction:column;
+  gap:clamp(12px,1.6vw,24px)}
+.row{display:grid;grid-template-columns:44px minmax(180px,1.6fr) 3fr;
+  gap:clamp(12px,1.4vw,22px);align-items:start}
+.num{width:34px;height:34px;border-radius:50%;background:var(--red);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.row h3{font-size:clamp(14px,1.3vw,20px);font-weight:700;padding-top:5px}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(14px,1.8vw,30px);
+  margin-top:auto}
+.stat .n{font-size:clamp(34px,4.4vw,66px);font-weight:700;color:var(--red);line-height:1}
+.stat .l{color:var(--dim);font-size:clamp(11px,.95vw,14px);margin-top:10px;line-height:1.5}
+.banner{margin-top:auto;background:var(--card);border:1px solid var(--line);
+  border-radius:10px;padding:clamp(16px,1.6vw,24px)}
+
+.frame{flex:1;margin-top:2.5vh;border:1px solid var(--line);border-radius:10px;
+  overflow:hidden;background:#0a0a0c;min-height:0;position:relative}
+.frame iframe{border:0;display:block;transform-origin:0 0;background:#0a0a0c}
+.frame .full{position:absolute;bottom:10px;right:12px;z-index:5;font-size:11px;
+  background:rgba(14,15,19,.82);border:1px solid var(--line);border-radius:6px;
+  padding:5px 10px;color:var(--dim);backdrop-filter:blur(6px)}
+.frame .full:hover{color:#fff;border-color:#4a4f5c;text-decoration:none}
+.caprow{display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+  flex-wrap:wrap;padding-right:130px}
+.cap{color:var(--mute);font-size:clamp(10px,.8vw,12px);margin-top:10px;font-style:italic}
+
+.big{font-size:clamp(26px,3.4vw,50px);font-weight:700;line-height:1.2;
+  max-width:22ch;margin-bottom:4vh}
+.lede{color:var(--dim);font-size:clamp(13px,1.15vw,18px);line-height:1.7;max-width:78ch}
+
+.center{justify-content:center}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+.links{margin-top:2.5vh;display:flex;flex-direction:column;gap:10px;
+  font-size:clamp(12px,1.05vw,15px)}
+.tech{color:var(--dim);font-size:clamp(10px,.85vw,13px);letter-spacing:1.6px;margin-top:3.5vh}
+
+#nav{position:fixed;bottom:16px;right:20px;display:flex;gap:8px;align-items:center;z-index:20}
+#nav button{background:var(--card);border:1px solid var(--line);color:var(--dim);
+  width:34px;height:30px;border-radius:6px;cursor:pointer;font-size:14px}
+#nav button:hover{color:#fff;border-color:#4a4f5c}
+#count{color:var(--mute);font-size:12px;margin-right:6px;letter-spacing:1px}
+#bar{position:fixed;top:0;left:0;height:2px;background:var(--red);width:0;
+  transition:width .3s ease;z-index:20}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="stage">
+
+<!-- 1 -->
+<section class="slide on center">
+  <h1>Will Wagner</h1>
+  <div style="color:var(--red);font-size:clamp(16px,1.8vw,26px);font-weight:600;margin-top:12px">
+    Senior Analytics Engineer</div>
+  <div class="sub" style="max-width:46ch;margin-top:3vh">
+    Closing the loop between what a campaign costs and what it earns</div>
+  <div class="tech">SQL &nbsp;·&nbsp; PYTHON &nbsp;·&nbsp; SNOWFLAKE &nbsp;·&nbsp; BIGQUERY &nbsp;·&nbsp; AWS &nbsp;·&nbsp; GOOGLE CLOUD</div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <h2>I have worked all three sides of this problem</h2>
+  <div class="sub">Advertiser, publisher, and now the buyer who owns the revenue</div>
+  <div class="cards c3">
+    <div class="card">
+      <div class="lab" style="color:var(--blue)">Sell side</div>
+      <h3>Yahoo, advertisers</h3>
+      <p class="body">Owned campaign reporting for the Creative Strategists and Account Managers running advertiser accounts. Pacing against monthly allowance, daily spend rate, click through and conversion, video completion, keyword level cost per click.</p>
+    </div>
+    <div class="card">
+      <div class="lab" style="color:var(--green)">Supply side</div>
+      <h3>Yahoo, publishers</h3>
+      <p class="body">Built the publisher side of the same reporting for network partners including WebMD and Mozilla. Two audiences, one set of models, neither side seeing the other.</p>
+    </div>
+    <div class="card">
+      <div class="lab" style="color:var(--red)">Buy side</div>
+      <h3>Where Netflix sits</h3>
+      <p class="body">On the sell side we could show advertisers everything except what the campaign actually earned them. Netflix buys the campaigns and owns the sales data, so that loop can finally close.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <h2>What I build</h2>
+  <div class="sub">Tools people use to decide something, not charts they screenshot</div>
+  <div class="rows">
+    <div class="row"><div class="num">1</div><h3>Models as the source of truth</h3>
+      <p class="body">Dimensional, normalized, and metadata driven models built as reusable entities that many downstream products share. Schemas that survive platform migrations.</p></div>
+    <div class="row"><div class="num">2</div><h3>Self service that holds up</h3>
+      <p class="body">Interactive applications with drill down, on demand comparison, and metric definitions surfaced in the interface, so nobody has to ask what a column means. Adoption is the measure I care about.</p></div>
+    <div class="row"><div class="num">3</div><h3>Engineering around the data</h3>
+      <p class="body">Version control, monitoring for freshness and platform health, idempotent loads, watermark based incremental extraction, and capture that repairs itself when jobs overlap.</p></div>
+    <div class="row"><div class="num">4</div><h3>Speed over perfection</h3>
+      <p class="body">I ship the version that answers the question this week and improve it next week. My archive framework, hourly demand pipeline, and recovery model all reached production while the alternative was still being scoped.</p></div>
+  </div>
+</section>
+
+<!-- 4 : live embed -->
+<section class="slide">
+  <h2>Split Orders</h2>
+  <div class="sub">Live below. Switch views, sort a column, click a row.</div>
+  <div class="frame" data-embed>
+    <a class="full" href="https://wowagner2015.github.io/professionalprofile/split-orders.html" target="_blank" rel="noopener">Open full size &#8599;</a>
+    <iframe src="https://wowagner2015.github.io/professionalprofile/split-orders.html" title="Split Orders dashboard" loading="lazy"></iframe>
+  </div>
+  <div class="cap caprow"><span>Volumes scaled by a constant for sharing. Rates, trends, and seasonality unchanged.</span><span>Scroll inside the panel for the full grid</span></div>
+</section>
+
+<!-- 5 : second live embed -->
+<section class="slide">
+  <h2>Demand Intraday Performance</h2>
+  <div class="sub">Live below. Switch days to see how an unfinished hour is handled.</div>
+  <div class="frame" data-embed>
+    <a class="full" href="https://wowagner2015.github.io/professionalprofile/demand-intraday.html" target="_blank" rel="noopener">Open full size &#8599;</a>
+    <iframe src="https://wowagner2015.github.io/professionalprofile/demand-intraday.html" title="Demand intraday dashboard" loading="lazy"></iframe>
+  </div>
+  <div class="cap caprow"><span>Sample data shaped to a real retail curve. The design and the logic are the work.</span><span>Switch days at the top right of the panel</span></div>
+</section>
+
+<!-- 6 : inventory -->
+<section class="slide">
+  <h2>Warehouse Allocation</h2>
+  <div class="sub">Every location on the floor. Toggle between capacity and inventory age.</div>
+  <div class="frame" data-embed>
+    <a class="full" href="https://wowagner2015.github.io/professionalprofile/warehouse-allocation.html" target="_blank" rel="noopener">Open full size &#8599;</a>
+    <iframe src="https://wowagner2015.github.io/professionalprofile/warehouse-allocation.html" title="Warehouse allocation" loading="lazy"></iframe>
+  </div>
+  <div class="cap caprow"><span>Sample data shaped to a real network.</span><span>Click a location for detail</span></div>
+</section>
+
+<!-- 7 : claims workflow -->
+<section class="slide">
+  <h2>When a report stops being a report</h2>
+  <div class="sub">Skill based claim routing built on the BI platform. Over 30 days to under 10. Toggle Manual.</div>
+  <div class="frame" data-embed>
+    <a class="full" href="https://wowagner2015.github.io/professionalprofile/claims-workflow.html" target="_blank" rel="noopener">Open full size &#8599;</a>
+    <iframe src="https://wowagner2015.github.io/professionalprofile/claims-workflow.html" title="Claims distribution console" loading="lazy"></iframe>
+  </div>
+  <div class="cap caprow"><span>Sample data shaped to a real operation.</span><span>The Manual toggle is the point</span></div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <h2>The engineering underneath</h2>
+  <div class="sub">Three things I built that were not on anyone's roadmap</div>
+  <div class="cards c3">
+    <div class="card"><h3>A time machine for data</h3>
+      <p class="body">Source tables are overwritten continuously and native time travel keeps only days. I built a generic archive any table can join with one procedure call and a retention setting. It snapshots only on change, repairs itself when two jobs overlap, and returns data in the original layout.</p></div>
+    <div class="card"><h3>Reports honest about failure</h3>
+      <p class="body">A four tier recovery model reconstructs a missing hour from the best surviving source and labels every recovered value with its origin, so leadership sees a complete report and knows exactly which numbers were rebuilt.</p></div>
+    <div class="card"><h3>DataGINI</h3>
+      <p class="body">My own ingest and orchestration framework, roughly 10,000 lines of Python, sole author. Declarative YAML catalog, connectors rather than engine edits, parameter inheritance across job groups. Runs in production against ERP, commerce, loyalty, and legacy systems.</p></div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <h2>Track record</h2>
+  <div class="stats">
+    <div class="stat"><div class="n">25+</div><div class="l">years modeling data for operational decisions</div></div>
+    <div class="stat"><div class="n">4</div><div class="l">patents as named inventor, two issued</div></div>
+    <div class="stat"><div class="n">1,000+</div><div class="l">users on an analytics platform I consolidated and governed</div></div>
+    <div class="stat"><div class="n">8</div><div class="l">years inside the ad marketplace at Yahoo</div></div>
+  </div>
+  <div class="banner">
+    <h3 style="font-size:clamp(14px,1.25vw,19px);margin-bottom:10px">Named Yahoo Inventor of the Year, 2024</h3>
+    <p class="body">The award came from the Future Study Group, a volunteer group of inventors who did the work because we cared about the technology and the users, not because anyone assigned it.</p>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slide center">
+  <div class="kicker">The problem I want to work on</div>
+  <div class="big">Campaign spend and the revenue it produced, in one model, close to real time.</div>
+  <p class="lede">At Yahoo we could show an advertiser every measure except the one they cared about most, which was what the campaign earned them. That number lived on the other side of a wall. Netflix sits on both sides: the campaign goes out and the demand comes back. Since campaigns launch exactly when the lift is needed, watching that loop next to demand rather than reading about it weeks later is the work I would most want to own.</p>
+</section>
+
+<!-- 8 -->
+<section class="slide center">
+  <h1 style="font-size:clamp(26px,3.2vw,46px)">Will Wagner</h1>
+  <div class="sub">will@heximind.com &nbsp;·&nbsp; Costa Mesa, California</div>
+  <div class="links">
+    <a href="https://www.linkedin.com/in/willwwagner/" target="_blank" rel="noopener">linkedin.com/in/willwwagner</a>
+    <a href="https://github.com/wowagner2015" target="_blank" rel="noopener">github.com/wowagner2015</a>
+    <a href="https://wowagner2015.github.io/professionalprofile/" target="_blank" rel="noopener">Professional profile</a>
+  </div>
+</section>
+
+</div>
+
+<div id="nav">
+  <span id="count"></span>
+  <button id="prev" aria-label="Previous slide">&#8249;</button>
+  <button id="next" aria-label="Next slide">&#8250;</button>
+</div>
+
+<script>
+(function(){
+  var slides = [].slice.call(document.querySelectorAll('.slide'));
+  var i = 0;
+  var count = document.getElementById('count');
+  var bar = document.getElementById('bar');
+  function show(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(s,k){ s.classList.toggle('on', k === i); });
+    count.textContent = (i+1) + ' / ' + slides.length;
+    if (typeof fitEmbeds === 'function') setTimeout(fitEmbeds, 0);
+    bar.style.width = ((i+1)/slides.length*100) + '%';
+    try {
+      if (location.hash !== '#' + (i+1)) history.replaceState(null,'','#'+(i+1));
+    } catch(e) { /* cross-origin frame: hash updates unavailable, navigation still works */ }
+  }
+  document.getElementById('next').onclick = function(){ show(i+1); };
+  document.getElementById('prev').onclick = function(){ show(i-1); };
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { show(i+1); e.preventDefault(); }
+    if(e.key === 'ArrowLeft'  || e.key === 'PageUp') { show(i-1); e.preventDefault(); }
+    if(e.key === 'Home') show(0);
+    if(e.key === 'End') show(slides.length-1);
+  });
+  window.addEventListener('hashchange', function(){
+    var h = parseInt((location.hash||'').replace('#',''),10);
+    if(!isNaN(h) && h-1 !== i) show(h-1);
+  });
+  /* Embedded dashboards are laid out for a desktop width. Rather than let a
+     narrow slide clip the right-hand columns, render the iframe at its design
+     width and scale the whole panel down to fit, then give it back the height
+     it lost so the internal scroll still reaches the bottom of the grid. */
+  var LOGICAL = 1360;
+  function fitEmbeds(){
+    [].forEach.call(document.querySelectorAll('[data-embed]'), function(box){
+      var f = box.querySelector('iframe');
+      if(!f) return;
+      var w = box.clientWidth, h = box.clientHeight;
+      if(!w || !h) return;
+      /* Below this width the dashboards' own mobile breakpoints do a better
+         job than shrinking a desktop layout into illegibility, so hand the
+         panel over to them at native scale instead of scaling it down. */
+      if(w < 760){
+        f.style.width='100%'; f.style.height='100%'; f.style.transform='none';
+        return;
+      }
+      var iw = Math.max(LOGICAL, w);
+      var scale = w / iw;
+      f.style.width  = iw + 'px';
+      f.style.height = (h / scale) + 'px';
+      f.style.transform = scale === 1 ? 'none' : 'scale(' + scale + ')';
+    });
+  }
+  window.addEventListener('resize', fitEmbeds);
+  window.addEventListener('load', fitEmbeds);
+
+  var start = parseInt((location.hash||'').replace('#',''),10);
+  show(isNaN(start) ? 0 : start-1);
+  fitEmbeds();
+})();
+</script>
+</body>
+</html>
