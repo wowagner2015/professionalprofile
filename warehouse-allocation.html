@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Warehouse Allocation</title>
+<style>
+html,body{margin:0;padding:0;background:#0c0f0e}
+body{padding:16px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif}
+.wh{--tl:#2dd4bf;--am:#f59e0b;--rd:#f43f5e;--gn:#4ade80;--gy:#8b98a5;--ln:#1e2a2c;--cd:#131a1b;
+  background:#0c0f0e;color:#e6f0ef;max-width:100%}
+.hd{background:linear-gradient(90deg,#101b1c,#131a1b);padding:14px 16px;border-bottom:1px solid var(--ln);
+  display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.hd h1{font-size:21px;font-weight:800;letter-spacing:-.3px;margin:0}
+.hd .sb{font-size:9.5px;text-transform:uppercase;letter-spacing:2.2px;color:var(--gy);margin-top:5px}
+.seg{display:flex;gap:0}
+.seg button{background:transparent;border:1px solid var(--ln);border-right:none;color:var(--gy);
+  padding:8px 15px;font-size:9.5px;letter-spacing:1.6px;cursor:pointer;font-weight:600;
+  font-family:inherit;text-transform:uppercase;transition:.15s}
+.seg button:last-child{border-right:1px solid var(--ln)}
+.seg button.on{background:var(--tl);color:#06201d;border-color:var(--tl)}
+.seg button:hover:not(.on){color:#cfe9e6}
+.kpi{display:flex;flex-wrap:wrap;gap:10px;padding:14px 16px}
+.k{flex:1 1 165px;background:var(--cd);border:1px solid var(--ln);border-radius:8px;padding:12px 14px;
+  border-top:2px solid var(--tl)}
+.k.a{border-top-color:var(--am)} .k.r{border-top-color:var(--rd)}
+.k .l{font-size:9.5px;text-transform:uppercase;letter-spacing:1.6px;color:var(--gy)}
+.k .v{font-size:25px;font-weight:800;font-family:monospace;letter-spacing:-1px;margin:7px 0 3px}
+.k .s{font-size:10.5px;color:var(--gy)}
+.main{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;padding:0 16px 16px}
+@media(max-width:980px){.main{grid-template-columns:1fr}}
+.pnl{background:var(--cd);border:1px solid var(--ln);border-radius:8px;padding:14px}
+.pt{font-size:9.5px;text-transform:uppercase;letter-spacing:2px;color:var(--gy);margin-bottom:12px}
+.zone{margin-bottom:16px}
+.zh{font-size:10px;letter-spacing:2.4px;color:#3d5457;font-weight:700;margin-bottom:8px}
+.grid{display:grid;gap:5px}
+.gA{grid-template-columns:repeat(6,minmax(0,1fr))}
+.gW{grid-template-columns:repeat(11,minmax(0,1fr))}
+@media(max-width:700px){.gW{grid-template-columns:repeat(6,minmax(0,1fr))}}
+.bin{aspect-ratio:1.35;border-radius:4px;border:1px solid rgba(255,255,255,.06);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;transition:.12s;
+  font-family:monospace;line-height:1.15;min-height:38px}
+.bin:hover{border-color:rgba(255,255,255,.55);transform:translateY(-1px)}
+.bin.sel{border-color:#fff;border-width:2px}
+.bin .id{font-size:10.5px;font-weight:700}
+.bin .vl{font-size:9.5px;opacity:.85;margin-top:2px}
+.bin.empty{background:#0e1414 !important;color:#33474a}
+.lg{display:flex;gap:14px;flex-wrap:wrap;font-size:10px;color:var(--gy);margin-top:6px;
+  padding-top:10px;border-top:1px solid var(--ln)}
+.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.dt{border-top:1px solid var(--ln);margin-top:12px;padding-top:12px;display:none}
+.dt.on{display:block}
+.dg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.dg .dl{font-size:9px;text-transform:uppercase;letter-spacing:1.4px;color:var(--gy)}
+.dg .dv{font-size:17px;font-weight:800;font-family:monospace;margin-top:4px}
+.row{display:flex;align-items:center;gap:10px;padding:7px 6px;border-radius:6px}
+.row:hover{background:rgba(45,212,191,.05)}
+.row .nm{flex:0 0 96px;font-size:12px;font-weight:700;color:#dcebe9}
+.row .nm span{display:block;font-size:9px;font-weight:400;color:var(--gy);letter-spacing:1.1px;
+  text-transform:uppercase;margin-top:2px}
+.bar{flex:1;height:18px;background:#0d1414;border:1px solid var(--ln);border-radius:4px;position:relative;
+  overflow:hidden;min-width:60px}
+.bar i{position:absolute;left:0;top:0;bottom:0}
+.bar b{position:absolute;right:6px;line-height:18px;font-size:10.5px;font-family:monospace;
+  font-weight:700;color:#e6f0ef;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.hint{font-size:10.5px;color:var(--gy);margin-top:10px;line-height:1.6}
+.cl{border-radius:4px;padding:12px 15px;margin:0 16px;border:1px solid #1d3a2d;
+  border-left:3px solid #35d07f;background:#101a15}
+.cl b{font-size:9px;letter-spacing:1.6px;text-transform:uppercase;color:#35d07f;display:block}
+.cl p{color:#8b989e;font-size:11.5px;margin:6px 0 0;line-height:1.65}
+.ft{padding:10px 16px 14px;font-size:9px;color:#33474a;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wh">
+  <div class="hd">
+    <div><h1>Warehouse Allocation</h1>
+      <div class="sb">Location map &middot; A zone reserve, W zone forward pick &middot; position as of this morning</div></div>
+    <div class="seg" id="seg">
+      <button data-m="cap" class="on">Capacity</button>
+      <button data-m="age">Inventory age</button>
+    </div>
+  </div>
+  <div class="kpi" id="kpi"></div>
+  <div class="main">
+    <div class="pnl">
+      <div class="pt" id="mapt"></div>
+      <div class="zone"><div class="zh">ZONE A &middot; RESERVE &middot; A1 to A12</div>
+        <div class="grid gA" id="zoneA"></div></div>
+      <div class="zone"><div class="zh">ZONE W &middot; FORWARD PICK &middot; W1 to W33</div>
+        <div class="grid gW" id="zoneW"></div></div>
+      <div class="lg" id="legend"></div>
+    </div>
+    <div class="pnl">
+      <div class="pt">Aisle rollup</div>
+      <div id="aisles"></div>
+      <div class="dt" id="detail"></div>
+      <div class="hint" id="hint"></div>
+    </div>
+  </div>
+  <div class="cl"><b>Summary</b><p id="summary"></p></div>
+  <div class="ft">
+    Sample data shaped to a real floor. Capacity is occupied pallet positions against the position count
+    for that location &middot; age is the oldest receipt still sitting in the location, not an average,
+    because the oldest carton is what determines whether the location needs to be worked &middot;
+    an empty location is shown dark rather than green: nothing to see is not the same as healthy.
+  </div>
+</div>
+<script>
+function mk(prefix,n,seed){
+  var out=[],i;
+  for(i=1;i<=n;i++){
+    var r=Math.abs(Math.sin(i*seed)*10000)%1;
+    var r2=Math.abs(Math.sin(i*seed*1.7+2)*10000)%1;
+    var cap=prefix==='A'?18:8;
+    var occ=Math.round(r*cap*1.12);
+    if(occ>cap+2) occ=cap+2;
+    out.push({id:prefix+i, aisle:prefix+(Math.ceil(i/(prefix==='A'?6:11))),
+      cap:cap, occ:occ, age:occ===0?0:Math.round(6+r2*118)});
+  }
+  return out;
+}
+var BINS = mk('A',12,3.7).concat(mk('W',33,2.3));
+var MODE='cap', SEL=null;
+
+function util(b){ return b.occ/b.cap; }
+function colCap(b){
+  if(b.occ===0) return null;
+  var u=util(b);
+  return u>1 ? '#f43f5e' : u>0.9 ? '#f59e0b' : u>0.6 ? '#2dd4bf' : '#4ade80';
+}
+function colAge(b){
+  if(b.occ===0) return null;
+  return b.age>90 ? '#f43f5e' : b.age>60 ? '#f59e0b' : b.age>30 ? '#2dd4bf' : '#4ade80';
+}
+function col(b){ return MODE==='cap'?colCap(b):colAge(b); }
+function val(b){ return b.occ===0 ? '—' : (MODE==='cap' ? Math.round(util(b)*100)+'%' : b.age+'d'); }
+
+function tile(b,k){
+  var c=col(b);
+  return '<div class="bin'+(c?'':' empty')+(SEL===k?' sel':'')+'" data-k="'+k+'"'+
+    (c?' style="background:'+c+'22;color:'+c+'"':'')+'>'+
+    '<span class="id">'+b.id+'</span><span class="vl">'+val(b)+'</span></div>';
+}
+
+function render(){
+  var occB=BINS.filter(function(b){return b.occ>0;});
+  var over=BINS.filter(function(b){return util(b)>1;}).length;
+  var empty=BINS.length-occB.length;
+  var aged=occB.filter(function(b){return b.age>90;}).length;
+  var totCap=BINS.reduce(function(a,b){return a+b.cap;},0);
+  var totOcc=BINS.reduce(function(a,b){return a+b.occ;},0);
+  var oldest=occB.reduce(function(a,b){return b.age>a.age?b:a;},occB[0]);
+
+  document.getElementById('kpi').innerHTML =
+    '<div class="k"><div class="l">Positions filled</div><div class="v" style="color:#2dd4bf">'+
+      (totOcc/totCap*100).toFixed(1)+'%</div><div class="s">'+totOcc+' of '+totCap+' across 45 locations</div></div>'+
+    '<div class="k '+(over?'r':'')+'"><div class="l">Locations over capacity</div><div class="v" style="color:'+
+      (over?'#f43f5e':'#4ade80')+'">'+over+'</div><div class="s">overflow is stacked in the aisle</div></div>'+
+    '<div class="k '+(aged?'a':'')+'"><div class="l">Aged over 90 days</div><div class="v" style="color:'+
+      (aged?'#f59e0b':'#4ade80')+'">'+aged+'</div><div class="s">locations holding stale receipts</div></div>'+
+    '<div class="k"><div class="l">Empty locations</div><div class="v" style="color:#8b98a5">'+empty+
+      '</div><div class="s">available to absorb overflow</div></div>';
+
+  document.getElementById('mapt').textContent = MODE==='cap'
+    ? 'FLOOR MAP · COLOUR IS FILL AGAINST THE LOCATION CEILING · CLICK A LOCATION'
+    : 'FLOOR MAP · COLOUR IS THE OLDEST RECEIPT IN THE LOCATION · CLICK A LOCATION';
+
+  document.getElementById('zoneA').innerHTML =
+    BINS.map(function(b,k){return b.id[0]==='A'?tile(b,k):'';}).join('');
+  document.getElementById('zoneW').innerHTML =
+    BINS.map(function(b,k){return b.id[0]==='W'?tile(b,k):'';}).join('');
+  [].forEach.call(document.querySelectorAll('.bin'), function(el){
+    el.onclick=function(){ var k=+el.getAttribute('data-k'); SEL=(SEL===k?null:k); render(); };
+  });
+
+  document.getElementById('legend').innerHTML = MODE==='cap'
+    ? '<span><i style="background:#4ade80"></i>Under 60%</span>'+
+      '<span><i style="background:#2dd4bf"></i>60 to 90%</span>'+
+      '<span><i style="background:#f59e0b"></i>90 to 100%, tight</span>'+
+      '<span><i style="background:#f43f5e"></i>Over ceiling</span>'+
+      '<span><i style="background:#0e1414"></i>Empty</span>'
+    : '<span><i style="background:#4ade80"></i>Under 30 days</span>'+
+      '<span><i style="background:#2dd4bf"></i>30 to 60</span>'+
+      '<span><i style="background:#f59e0b"></i>60 to 90</span>'+
+      '<span><i style="background:#f43f5e"></i>Over 90 days</span>'+
+      '<span><i style="background:#0e1414"></i>Empty</span>';
+
+  var aisles={};
+  BINS.forEach(function(b){
+    if(!aisles[b.aisle]) aisles[b.aisle]={cap:0,occ:0,age:0,n:0,old:0};
+    var a=aisles[b.aisle]; a.cap+=b.cap; a.occ+=b.occ;
+    if(b.occ>0){ a.n++; a.age+=b.age; if(b.age>a.old) a.old=b.age; }
+  });
+  document.getElementById('aisles').innerHTML = Object.keys(aisles).map(function(key){
+    var a=aisles[key], u=a.occ/a.cap, avg=a.n?Math.round(a.age/a.n):0;
+    var shown = MODE==='cap' ? u : Math.min(avg,120)/120;
+    var c = MODE==='cap'
+      ? (u>1?'#f43f5e':u>0.9?'#f59e0b':u>0.6?'#2dd4bf':'#4ade80')
+      : (avg>90?'#f43f5e':avg>60?'#f59e0b':avg>30?'#2dd4bf':'#4ade80');
+    return '<div class="row"><div class="nm">Aisle '+key+'<span>'+
+      (key[0]==='A'?'reserve':'forward pick')+'</span></div>'+
+      '<div class="bar"><i style="width:'+(Math.min(shown,1.2)/1.2*100).toFixed(1)+'%;background:'+c+
+      ';opacity:.55"></i><b>'+(MODE==='cap'?Math.round(u*100)+'%':avg+'d')+'</b></div></div>';
+  }).join('');
+
+  var d=document.getElementById('detail');
+  if(SEL===null){ d.className='dt'; d.innerHTML=''; }
+  else{
+    var b=BINS[SEL];
+    d.className='dt on';
+    d.innerHTML='<div class="pt" style="margin-bottom:10px">Location '+b.id+' &middot; aisle '+b.aisle+'</div>'+
+      '<div class="dg">'+
+      '<div><div class="dl">Occupied</div><div class="dv" style="color:#2dd4bf">'+b.occ+' / '+b.cap+'</div></div>'+
+      '<div><div class="dl">Fill</div><div class="dv" style="color:'+(colCap(b)||'#8b98a5')+'">'+
+        (b.occ?Math.round(util(b)*100)+'%':'empty')+'</div></div>'+
+      '<div><div class="dl">Oldest receipt</div><div class="dv" style="color:'+(colAge(b)||'#8b98a5')+'">'+
+        (b.occ?b.age+' days':'—')+'</div></div>'+
+      '<div><div class="dl">Free positions</div><div class="dv">'+Math.max(0,b.cap-b.occ)+'</div></div>'+
+      '</div>';
+  }
+
+  document.getElementById('hint').textContent = MODE==='cap'
+    ? 'Capacity tells you where product will not fit tonight. A location past its ceiling means cartons '
+      + 'are staged in the aisle, which slows every pick that passes through it.'
+    : 'Age tells you where product has stopped moving. A location can be comfortably within capacity and '
+      + 'still be the biggest problem on the floor if what is in it has not moved in four months.';
+
+  document.getElementById('summary').textContent =
+    'The floor is '+(totOcc/totCap*100).toFixed(1)+'% full with '+empty+' locations standing empty, so '+
+    (over? over+' location'+(over>1?'s are':' is')+' over ceiling by placement rather than by a lack of space. '
+         : 'no location is over its ceiling. ')+
+    aged+' location'+(aged===1?' holds':'s hold')+' receipts older than 90 days, the oldest at '+
+    oldest.age+' days in '+oldest.id+'. Switching to inventory age shows a different floor from the capacity view, '+
+    'which is the point of having both.';
+}
+[].forEach.call(document.querySelectorAll('#seg button'), function(b){
+  b.onclick=function(){ MODE=b.getAttribute('data-m');
+    [].forEach.call(document.querySelectorAll('#seg button'),function(x){x.classList.remove('on');});
+    b.classList.add('on'); render(); };
+});
+render();
+</script>
+</body>
+</html>
