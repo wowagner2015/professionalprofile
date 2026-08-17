@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Split Orders - DC vs Store Fulfillment</title>
+<style>html,body{margin:0;padding:0;background:#0a0a0c}body{padding:16px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif}</style>
+</head>
+<body>
+<style>
+.osd{--gv:#4da3ff;--gvd:#1c4f8a;--gm:#a98bff;--gmd:#4e3a8c;--gs:#35d07f;--gsd:#1a6b45;--gr:#ffb020;--grd:#8a5c10;--gc:#ff6b7a;--gcd:#8a2f39;--bg:#0a0a0c;--pn:#121319;--pn2:#1a1c24;--ln:#2a2d38;--ink:#f2f3f7;--dim:#8b909e;--fnt:#5a5f6d;background:var(--bg);color:var(--ink);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;padding:18px;border-radius:4px;position:relative}
+.osd *{box-sizing:border-box;margin:0;padding:0}
+.osd .hd{background:#000;border:1px solid #1e1e22;border-radius:4px;padding:18px 22px;margin-bottom:13px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+.osd .brand{display:flex;align-items:center;gap:16px}
+.osd .brand .wm{font-size:16px;font-weight:700;letter-spacing:7px;color:#fff}
+.osd .brand .bar{width:1px;height:30px;background:#33353d}
+.osd .hd h1{font-size:17px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase}
+.osd .hd .sb{color:var(--dim);font-size:9.5px;letter-spacing:2.2px;margin-top:5px;font-weight:500;text-transform:uppercase}
+.osd .ctl{display:flex;gap:0}
+.osd .ctl button{background:transparent;border:1px solid #33353d;border-right:none;color:var(--dim);padding:8px 16px;font-size:9.5px;letter-spacing:1.6px;cursor:pointer;font-weight:600;font-family:inherit;transition:.15s;text-transform:uppercase}
+.osd .ctl button:last-child{border-right:1px solid #33353d}
+.osd .ctl button:hover{color:#fff;background:#1a1a1e}
+.osd .ctl button.on{background:#fff;color:#000;border-color:#fff}
+.osd .seg{display:flex;gap:0;flex-wrap:wrap}
+.osd .seg button{background:transparent;border:1px solid var(--ln);border-right:none;color:var(--dim);padding:6px 13px;font-size:9px;letter-spacing:1.3px;cursor:pointer;font-weight:600;font-family:inherit;transition:.15s;text-transform:uppercase}
+.osd .seg button:last-child{border-right:1px solid var(--ln)}
+.osd .seg button:hover{color:var(--ink)}
+.osd .seg button.on{color:#0a0a0c;font-weight:700}
+.osd .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.osd .kpi{background:var(--pn);border:1px solid var(--ln);border-radius:4px;padding:14px 16px;border-top:2px solid var(--ln);cursor:pointer;transition:.15s}
+.osd .kpi:hover{background:var(--pn2)}
+.osd .kpi .lb{font-size:8.5px;letter-spacing:1.6px;color:var(--dim);font-weight:600;text-transform:uppercase}
+.osd .kpi .vl{font-size:26px;font-weight:700;margin:8px 0 3px;letter-spacing:-.5px}
+.osd .kpi .sb{font-size:10px;color:var(--fnt)}
+.osd .up{color:var(--gs)}.osd .dn{color:var(--gc)}.osd .nu{color:var(--gr)}
+.osd .pn{background:var(--pn);border:1px solid var(--ln);border-radius:4px;padding:15px 17px;margin-bottom:13px}
+.osd .ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;flex-wrap:wrap;gap:9px}
+.osd .ph h3{font-size:9.5px;letter-spacing:2px;color:var(--dim);font-weight:600;text-transform:uppercase}
+.osd .hint{font-size:10px;color:var(--fnt)}
+.osd .ch{display:flex;align-items:flex-end;gap:7px;height:175px;padding-top:12px}
+.osd .gp{flex:1;display:flex;gap:2px;align-items:flex-end;height:100%;cursor:pointer}
+.osd .gp i{flex:1;border-radius:1px 1px 0 0;display:block;transition:.2s;min-height:2px}
+.osd .gp:hover i{filter:brightness(1.3)}
+.osd .stk{flex:1;display:flex;flex-direction:column-reverse;height:100%;cursor:pointer;border-radius:1px;overflow:hidden}
+.osd .stk i{display:block;width:100%;transition:.2s}
+.osd .stk:hover i{filter:brightness(1.25)}
+.osd .xl{display:flex;gap:7px;margin-top:6px}
+.osd .xl span{flex:1;font-size:8.5px;color:var(--fnt);text-align:center;letter-spacing:.5px}
+.osd .xl span.on{color:var(--ink);font-weight:700}
+.osd .tw{overflow-x:auto}
+.osd table{width:100%;border-collapse:collapse;min-width:740px}
+.osd th{font-size:8.5px;letter-spacing:1px;font-weight:700;text-align:right;padding:8px 7px;cursor:pointer;white-space:nowrap;border-bottom:2px solid var(--ln);user-select:none;text-transform:uppercase}
+.osd th:hover{filter:brightness(1.3)}
+.osd th.l,.osd td.l{text-align:left}
+.osd td{padding:6px 7px;text-align:right;border-bottom:1px solid #1e2029;font-variant-numeric:tabular-nums}
+.osd td.l{font-weight:600}
+.osd tbody tr{cursor:pointer}
+.osd tbody tr:hover td{background:#1a1c24}
+.osd tbody tr.on td{background:#22252f}
+.osd .mut{color:var(--fnt)}
+.osd .mb{display:flex;height:11px;border-radius:2px;overflow:hidden;width:100%;min-width:90px}
+.osd .mb i{display:block;height:100%;cursor:pointer}
+.osd .lg{display:flex;gap:14px;margin-top:11px;flex-wrap:wrap}
+.osd .lg span{font-size:9.5px;color:var(--dim);display:flex;align-items:center;gap:5px;letter-spacing:.6px;cursor:pointer}
+.osd .dt{width:9px;height:9px;border-radius:1px;display:inline-block}
+.osd .cl{border-radius:4px;padding:12px 15px;margin-top:12px;border:1px solid;border-left-width:3px}
+.osd .cl.g{background:#101a15;border-color:#1d3a2d;border-left-color:var(--gs)}
+.osd .cl.w{background:#1a1510;border-color:#3a3020;border-left-color:var(--gr)}
+.osd .cl b{font-size:9px;letter-spacing:1.6px;text-transform:uppercase}
+.osd .cl.g b{color:var(--gs)}.osd .cl.w b{color:var(--gr)}
+.osd .cl p{color:var(--dim);font-size:11.5px;margin-top:6px;line-height:1.65}
+.osd .dw{background:var(--pn2);border:1px solid var(--ln);border-radius:4px;padding:15px 17px;margin-bottom:13px;display:none}
+.osd .dw.on{display:block}
+.osd .dg{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:11px}
+.osd .dc{background:var(--pn);border:1px solid var(--ln);border-radius:4px;padding:11px 13px;border-top:2px solid var(--ln)}
+.osd .dc .t{font-size:8.5px;letter-spacing:1.4px;font-weight:600;margin-bottom:7px;text-transform:uppercase}
+.osd .dc .rw{display:flex;justify-content:space-between;font-size:11px;padding:2px 0}
+.osd .dc .rw span:first-child{color:var(--fnt)}
+.osdtip{position:fixed;z-index:99999;max-width:290px;background:rgba(20,22,30,.90);border:1px solid #454a5e;border-radius:7px;padding:11px 13px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11.5px;line-height:1.6;color:#c9cdda;box-shadow:0 12px 34px rgba(0,0,0,.6);pointer-events:none;opacity:0;transform:translateY(5px);transition:opacity .13s ease,transform .13s ease;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}
+.osdtip.on{opacity:1;transform:translateY(0)}
+.osdtip b{display:block;color:#fff;font-size:10.5px;letter-spacing:1.3px;text-transform:uppercase;margin-bottom:6px}
+.osdtip u{display:block;text-decoration:none;color:#fff;font-weight:600}
+.osdtip .ar{position:absolute;width:11px;height:11px;background:rgba(20,22,30,.90);border:1px solid #454a5e;transform:rotate(45deg)}
+</style>
+<div class="osd" id="osdRoot">
+<div class="hd"><div class="brand">
+<div><h1>Split Orders</h1>
+<div class="sb">Digital Fulfillment &middot; DC vs Store &middot; This Year vs Last Year &middot; Data as of August 11, 2026</div></div></div>
+<div class="ctl" id="osdFy"></div></div>
+<div class="kpis" id="osdKpi"></div>
+<div class="pn"><div class="ph"><h3 id="osdTitle"></h3><div class="seg" id="osdSeg"></div></div>
+<div class="hint" id="osdHint"></div><div class="ch" id="osdChart"></div>
+<div class="xl" id="osdXl"></div><div class="lg" id="osdLeg"></div></div>
+<div class="dw" id="osdDrawer"></div>
+<div class="pn"><div class="ph"><h3 id="osdPerTitle">By Period</h3>
+<div class="hint">Newest first &middot; hover a heading for its definition &middot; click to sort &middot; click a row for detail</div></div>
+<div class="tw"><table><thead id="osdTh"></thead><tbody id="osdTb"></tbody></table></div>
+<div class="lg" id="osdMixLeg"></div></div>
+<div class="cl g"><b>Summary</b><p id="osdHead"></p></div>
+<div class="cl w"><b>Note</b><p>The newest period is still in progress and is shaded amber throughout.
+Its year over year and not complete figures reflect an unfinished period rather than performance.
+December is the seasonal peak, when inventory pressure pushes more orders out to stores.</p></div>
+</div>
+<script>
+(function(){
+var D=[
+{id:"202501",p:"FEB-25",fy:25,mtd:0,t:163775,tLY:153076,yoy:0.0699,dc:106334,ds:14855,st:27403,dr:14970,spl:30393,splLY:28751,r:0.1856,rLY:0.1878,d:-0.22,loc:1.29,locS:2.54,rel:220825,ar:1.35,arLY:1.34,arS:2.66,mx:27,nc:1,ncp:0.0,cn:578,nr:213},
+{id:"202502",p:"MAR-25",fy:25,mtd:0,t:250111,tLY:242180,yoy:0.0328,dc:166463,ds:21325,st:39216,dr:22802,spl:44206,splLY:40647,r:0.1767,rLY:0.1678,d:0.89,loc:1.27,locS:2.51,rel:354289,ar:1.42,arLY:1.32,arS:2.65,mx:21,nc:1,ncp:0.0,cn:1220,nr:306},
+{id:"202503",p:"APR-25",fy:25,mtd:0,t:208544,tLY:201243,yoy:0.0363,dc:139698,ds:20867,st:31142,dr:16467,spl:38982,splLY:43224,r:0.1869,rLY:0.2148,d:-2.79,loc:1.28,locS:2.52,rel:280027,ar:1.35,arLY:1.46,arS:2.65,mx:82,nc:6,ncp:0.0,cn:1418,nr:371},
+{id:"202504",p:"MAY-25",fy:25,mtd:0,t:247561,tLY:220331,yoy:0.1236,dc:169050,ds:23261,st:34616,dr:20179,spl:44349,splLY:43755,r:0.1791,rLY:0.1986,d:-1.95,loc:1.28,locS:2.54,rel:330717,ar:1.34,arLY:1.42,arS:2.68,mx:69,nc:5,ncp:0.0,cn:1673,nr:454},
+{id:"202505",p:"JUN-25",fy:25,mtd:0,t:272680,tLY:256720,yoy:0.0622,dc:173165,ds:32442,st:45351,dr:21160,spl:56967,splLY:57815,r:0.2089,rLY:0.2252,d:-1.63,loc:1.33,locS:2.57,rel:383703,ar:1.41,arLY:1.49,arS:2.75,mx:78,nc:9,ncp:0.0,cn:1648,nr:562},
+{id:"202506",p:"JUL-25",fy:25,mtd:0,t:301642,tLY:302468,yoy:-0.0027,dc:203989,ds:27319,st:43375,dr:25181,spl:52673,splLY:61298,r:0.1746,rLY:0.2027,d:-2.81,loc:1.26,locS:2.51,rel:405165,ar:1.35,arLY:1.44,arS:2.68,mx:80,nc:6,ncp:0.0,cn:2748,nr:1776},
+{id:"202507",p:"AUG-25",fy:25,mtd:0,t:301558,tLY:305814,yoy:-0.0139,dc:200719,ds:26418,st:45041,dr:28297,spl:53620,splLY:64783,r:0.1778,rLY:0.2118,d:-3.4,loc:1.26,locS:2.48,rel:411536,ar:1.37,arLY:1.49,arS:2.71,mx:114,nc:8,ncp:0.0,cn:2098,nr:1083},
+{id:"202508",p:"SEP-25",fy:25,mtd:0,t:297781,tLY:259989,yoy:0.1454,dc:181186,ds:28257,st:59407,dr:27976,spl:55034,splLY:68103,r:0.1848,rLY:0.2619,d:-7.71,loc:1.27,locS:2.43,rel:401786,ar:1.35,arLY:1.72,arS:2.61,mx:55,nc:13,ncp:0.0,cn:1774,nr:954},
+{id:"202509",p:"OCT-25",fy:25,mtd:0,t:233043,tLY:218967,yoy:0.0643,dc:145720,ds:16853,st:39967,dr:28751,spl:36957,splLY:43917,r:0.1586,rLY:0.2006,d:-4.2,loc:1.23,locS:2.44,rel:295497,ar:1.28,arLY:1.47,arS:2.55,mx:68,nc:4,ncp:0.0,cn:6064,nr:1752},
+{id:"202510",p:"NOV-25",fy:25,mtd:0,t:525763,tLY:489773,yoy:0.0735,dc:294222,ds:54334,st:128776,dr:47155,spl:108254,splLY:107832,r:0.2059,rLY:0.2202,d:-1.43,loc:1.33,locS:2.59,rel:730810,ar:1.39,arLY:1.7,arS:2.75,mx:33,nc:2,ncp:0.0,cn:3829,nr:1276},
+{id:"202511",p:"DEC-25",fy:25,mtd:0,t:630049,tLY:540591,yoy:0.1655,dc:315310,ds:68890,st:177832,dr:66326,spl:171080,splLY:142409,r:0.2715,rLY:0.2634,d:0.81,loc:1.5,locS:2.82,rel:1005336,ar:1.6,arLY:1.77,arS:3.05,mx:33,nc:25,ncp:0.0,cn:7574,nr:1691},
+{id:"202512",p:"JAN-25",fy:25,mtd:0,t:197738,tLY:168913,yoy:0.1706,dc:112432,ds:20309,st:50928,dr:13176,spl:42979,splLY:34017,r:0.2174,rLY:0.2014,d:1.6,loc:1.36,locS:2.64,rel:278827,ar:1.42,arLY:1.48,arS:2.77,mx:16,nc:22,ncp:0.0001,cn:1729,nr:892},
+{id:"202601",p:"FEB-26",fy:26,mtd:0,t:177661,tLY:163775,yoy:0.0848,dc:113392,ds:13453,st:38126,dr:11414,spl:28456,splLY:30393,r:0.1602,rLY:0.1856,d:-2.54,loc:1.25,locS:2.55,rel:229705,ar:1.3,arLY:1.35,arS:2.68,mx:18,nc:46,ncp:0.0003,cn:1764,nr:1277},
+{id:"202602",p:"MAR-26",fy:26,mtd:0,t:254120,tLY:250111,yoy:0.016,dc:169622,ds:20492,st:44902,dr:18715,spl:40868,splLY:44206,r:0.1608,rLY:0.1767,d:-1.59,loc:1.24,locS:2.49,rel:324598,ar:1.28,arLY:1.42,arS:2.6,mx:14,nc:5,ncp:0.0,cn:1047,nr:389},
+{id:"202603",p:"APR-26",fy:26,mtd:0,t:242986,tLY:208544,yoy:0.1652,dc:169279,ds:19892,st:38602,dr:14829,spl:33769,splLY:38982,r:0.139,rLY:0.1869,d:-4.79,loc:1.19,locS:2.35,rel:297805,ar:1.23,arLY:1.35,arS:2.43,mx:19,nc:5,ncp:0.0,cn:814,nr:385},
+{id:"202604",p:"MAY-26",fy:26,mtd:0,t:285469,tLY:247561,yoy:0.1531,dc:186888,ds:30698,st:48691,dr:18742,spl:51530,splLY:44349,r:0.1805,rLY:0.1791,d:0.14,loc:1.27,locS:2.49,rel:376137,ar:1.32,arLY:1.34,arS:2.6,mx:17,nc:4,ncp:0.0,cn:1028,nr:450},
+{id:"202605",p:"JUN-26",fy:26,mtd:0,t:362306,tLY:272680,yoy:0.3287,dc:240866,ds:37572,st:63179,dr:19486,spl:59960,splLY:56967,r:0.1655,rLY:0.2089,d:-4.34,loc:1.24,locS:2.45,rel:479641,ar:1.33,arLY:1.41,arS:2.64,mx:23,nc:19,ncp:0.0001,cn:1832,nr:1203},
+{id:"202606",p:"JUL-26",fy:26,mtd:0,t:375576,tLY:301642,yoy:0.2451,dc:248142,ds:38627,st:66542,dr:20831,spl:62541,splLY:52673,r:0.1665,rLY:0.1746,d:-0.81,loc:1.24,locS:2.45,rel:494230,ar:1.32,arLY:1.35,arS:2.63,mx:30,nc:446,ncp:0.0012,cn:2210,nr:1434},
+{id:"202607",p:"AUG-26",fy:26,mtd:1,t:151191,tLY:301558,yoy:-0.4986,dc:91666,ds:15334,st:25704,dr:8634,spl:25298,splLY:53620,r:0.1673,rLY:0.1778,d:-1.05,loc:1.25,locS:2.4,rel:184516,ar:1.31,arLY:1.37,arS:2.48,mx:10,nc:24180,ncp:0.1599,cn:710,nr:9853}
+];
+var GRAIN='Fiscal Month';
+var R=document.getElementById('osdRoot');
+var GR={vol:{n:'Volume',c:'--gv',d:'--gvd'},mix:{n:'Fulfillment Mix',c:'--gm',d:'--gmd'},
+spl:{n:'Splits',c:'--gs',d:'--gsd'},rel:{n:'Releases',c:'--gr',d:'--grd'},
+cmp:{n:'Completeness',c:'--gc',d:'--gcd'}};
+var MT={
+vol:{k:'t',ly:'tLY',l:'Total Orders',z:0,fmt:'n',h:'Digital orders captured, this year against last year.',
+ m:'Covers orders, orders last year and the change.'},
+mix:{stack:1,l:'Share by Path',h:'Every bar is one period at 100 percent, split by who fulfilled the order.',
+ m:'Covers DC only, DC plus store, store only and dropship.'},
+spl:{k:'r',ly:'rLY',l:'Split Rate',z:1,fmt:'p',h:'Orders sent to two or more ship-from locations. Lower is better.',
+ m:'Covers split orders, split rate against last year and average locations.'},
+rel:{k:'ar',ly:'arLY',l:'Releases per Order',z:1,fmt:'d',h:'Average releases per order. One release is one pick assignment.',
+ m:'Covers total releases, releases per order against last year, and the busiest single order.'},
+cmp:{k:'cnShare',ly:null,l:'Cancelled Share',z:1,fmt:'p',h:'Orders with at least one cancelled unit, as a share of the period.',
+ m:'Covers not complete, cancelled units and orders with no release.'}};
+/* every tooltip shows the measures that belong to its own group */
+function grpLines(d){
+if(G==='vol')return ['This year: '+n(d.t),'Last year: '+n(d.tLY),
+ 'Change: '+(d.yoy>0?'+':'')+p1(d.yoy)];
+if(G==='spl')return ['Split rate: '+p2(d.r),'Last year: '+p2(d.rLY),
+ 'Gap: '+(d.d>0?'+':'')+d2(d.d)+' points','Split orders: '+n(d.spl)+' of '+n(d.t),
+ 'Average locations: '+d2(d.loc)];
+if(G==='rel')return ['Per order: '+d2(d.ar),'Last year: '+d2(d.arLY),
+ 'Per split order: '+d2(d.arS),'Busiest single order: '+d.mx+' releases',
+ 'Total releases: '+n(d.rel)];
+if(G==='cmp')return ['Not complete: '+n(d.nc)+'  ('+p2(d.ncp)+')',
+ 'Cancelled units: '+n(d.cn)+'  ('+p2(d.cn/d.t)+')','No release: '+n(d.nr),
+ 'Total orders: '+n(d.t)];
+return [];}
+var MIX=[['dc','DC only','--gv','Fulfilled entirely from the distribution center'],
+['ds','DC + store','--gm','The DC and at least one store each fulfilled part of the order'],
+['st','Store only','--gs','Fulfilled entirely by one or more stores'],
+['dr','Dropship','--gr','Shipped direct by a vendor']];
+D.forEach(function(d){d.cnShare=d.cn/d.t;d.stShare=d.st/d.t;d.dcShare=d.dc/d.t;});
+var FY='all',G='vol',SK='id',SD=-1,SEL=null;
+var cv=function(v){return getComputedStyle(R).getPropertyValue(v).trim();};
+var n=function(x){return Math.round(x).toLocaleString('en-US');};
+var p1=function(x){return (x*100).toFixed(1)+'%';};
+var p2=function(x){return (x*100).toFixed(2)+'%';};
+var d2=function(x){return (+x).toFixed(2);};
+var fv=function(v,f){return f==='n'?n(v):f==='p'?p2(v):d2(v);};
+var esc=function(s){return String(s).replace(/"/g,'&quot;');};
+/* newest period first everywhere: leftmost bar and top table row */
+var rows=function(){return D.filter(function(d){return FY==='all'||d.fy==+FY;})
+.sort(function(a,b){return a.id<b.id?1:a.id>b.id?-1:0;});};
+var years=[];D.forEach(function(d){if(years.indexOf(d.fy)<0)years.push(d.fy);});
+years.sort(function(a,b){return a-b;});
+
+/* speech-bubble tooltip: data-tip="Heading||line||line", points at its source */
+var TB=document.createElement('div');TB.className='osdtip';
+TB.innerHTML='<span class="tc"></span><i class="ar"></i>';R.appendChild(TB);
+var TC=TB.querySelector('.tc'),AR=TB.querySelector('.ar'),CUR=null;
+function tipShow(el){var raw=el.getAttribute('data-tip');if(!raw)return;CUR=el;
+var q=raw.split('||');TC.innerHTML='<b>'+q[0]+'</b>'+q.slice(1).map(function(s){
+return s.charAt(0)==='*'?'<u>'+s.slice(1)+'</u>':s;}).join('<br>');
+TB.className='osdtip on';TB.style.left='-9999px';TB.style.top='0px';
+var b=el.getBoundingClientRect(),w=TB.offsetWidth,h=TB.offsetHeight;
+/* chart columns are full height, so anchor to the top of the tallest bar
+   inside rather than the top of the column, or the bubble floats away */
+var aTop=b.top;
+if(/(^| )(gp|stk)( |$)/.test(el.className)){
+ var ch=el.getElementsByTagName('i'),mn=1e9,cr;
+ for(var i=0;i<ch.length;i++){cr=ch[i].getBoundingClientRect();
+  if(cr.height>0&&cr.top<mn)mn=cr.top;}
+ if(mn<1e9)aTop=mn;}
+var r={left:b.left,width:b.width,top:aTop,bottom:b.bottom};
+var vw=document.documentElement.clientWidth,vh=document.documentElement.clientHeight;
+var cx=r.left+r.width/2,below=false;
+var top=r.top-h-8;if(top<8){top=r.bottom+8;below=true;}
+if(below&&top+h>vh-8){top=Math.max(8,r.top-h-8);below=false;}
+var left=Math.max(8,Math.min(cx-w/2,vw-w-8));
+TB.style.left=left+'px';TB.style.top=top+'px';
+var ax=Math.max(9,Math.min(cx-left-5.5,w-20));AR.style.left=ax+'px';
+if(below){AR.style.top='-6px';AR.style.borderWidth='1px 0 0 1px';}
+else{AR.style.top=(h-6)+'px';AR.style.borderWidth='0 1px 1px 0';}}
+function tipHide(){CUR=null;TB.className='osdtip';}
+R.addEventListener('mouseover',function(e){var t=e.target;
+while(t&&t!==R){if(t.getAttribute&&t.getAttribute('data-tip')){if(t!==CUR)tipShow(t);return;}t=t.parentNode;}
+if(CUR)tipHide();});
+R.addEventListener('mouseleave',tipHide);
+if(R.parentNode)R.parentNode.addEventListener('scroll',tipHide,true);
+window.addEventListener('scroll',tipHide,true);
+
+document.getElementById('osdFy').innerHTML='<button data-fy="all" class="on" data-tip="All Periods||Every period returned by the report.">All Periods</button>'+
+years.map(function(y){return '<button data-fy="'+y+'" data-tip="Fiscal Year '+y+'||Limit every panel to FY'+y+'.">FY'+y+'</button>';}).join('');
+
+function kpi(){var Rw=rows();var cl=Rw.filter(function(d){return !d.mtd;});
+/* rows() is newest first, so the latest completed period is the first one */
+var last=cl.length?cl[0]:Rw[0];
+var imp=cl.filter(function(d){return d.d<0;}).length;
+var tr=Rw.reduce(function(a,b){return a+b.rel;},0);
+var mx=0,mxp='';Rw.forEach(function(d){if(d.mx>mx){mx=d.mx;mxp=d.p;}});
+var c=[
+['vol','Orders &middot; '+last.p,n(last.t),(last.yoy>0?'+':'')+p1(last.yoy)+' vs last year',last.yoy>0?'up':'dn',
+ 'Total Orders||*'+last.p+'||This year: '+n(last.t)+'||Last year: '+n(last.tLY)+
+ '||Change: '+(last.yoy>0?'+':'')+p1(last.yoy)+'||Digital orders with a ship-to-address line. Pick up in store and call center are excluded.'],
+['mix','Store-only share',p1(last.stShare),'DC only '+p1(last.dcShare),'',
+ 'Store-only Share||*'+last.p+'||Store only: '+n(last.st)+'  ('+p1(last.stShare)+')||DC only: '+n(last.dc)+'  ('+p1(last.dcShare)+')||The balance went to a DC and store combination or a dropship vendor.'],
+['spl','Split rate &middot; '+last.p,p1(last.r),imp+' of '+cl.length+' better than last year',last.d<0?'up':'dn',
+ 'Split Rate||*'+last.p+'||This year: '+p2(last.r)+'||Last year: '+p2(last.rLY)+
+ '||Gap: '+(last.d>0?'+':'')+d2(last.d)+' points||Orders sent to two or more ship-from locations. Lower is better.'],
+['rel','Releases per order',d2(last.ar),'vs '+d2(last.arLY)+' last year &middot; max '+mx,last.ar<last.arLY?'up':'dn',
+ 'Releases per Order||*'+last.p+'||This year: '+d2(last.ar)+'||Last year: '+d2(last.arLY)+
+ '||Per split order: '+d2(last.arS)+'||Busiest single order: '+mx+' releases in '+mxp+
+ '||Total releases in range: '+n(tr)+'||One release is one pick assignment, so this is a workload measure.'],
+['cmp','Order issues &middot; '+last.p,n(last.cn+last.nc),'cancelled or not complete','',
+ 'Completeness||*'+last.p+'||Not complete: '+n(last.nc)+'  ('+p2(last.ncp)+')||Cancelled units: '+
+ n(last.cn)+'  ('+p2(last.cn/last.t)+')||No release: '+n(last.nr)+'||Total orders: '+n(last.t)+
+ '||Not complete means something on the order has not shipped yet. No release is a data check and should stay near zero.']];
+document.getElementById('osdKpi').innerHTML=c.map(function(a){
+return '<div class="kpi" data-g="'+a[0]+'" data-tip="'+esc(a[5])+'" style="border-top-color:'+cv(GR[a[0]].c)+'">'+
+'<div class="lb">'+a[1]+'</div><div class="vl" style="color:'+cv(GR[a[0]].c)+'">'+a[2]+'</div>'+
+'<div class="sb"><span class="'+a[4]+'">'+a[3]+'</span></div></div>';}).join('');
+Array.prototype.forEach.call(R.querySelectorAll('.kpi'),function(e){
+e.onclick=function(){G=e.getAttribute('data-g');tipHide();draw();};});}
+
+function chart(){var Rw=rows(),M=MT[G],c=cv(GR[G].c),cd=cv(GR[G].d);
+document.getElementById('osdTitle').innerHTML=GR[G].n+' &middot; '+M.l;
+document.getElementById('osdSeg').innerHTML=Object.keys(GR).map(function(g){
+return '<button data-g="'+g+'" data-tip="'+esc(GR[g].n+'||'+MT[g].h+'||'+MT[g].m)+'" class="'+(g===G?'on':'')+'" style="'+
+(g===G?'background:'+cv(GR[g].c)+';border-color:'+cv(GR[g].c):'')+'">'+GR[g].n+'</button>';}).join('');
+Array.prototype.forEach.call(R.querySelectorAll('#osdSeg button'),function(b){
+b.onclick=function(){G=b.getAttribute('data-g');tipHide();draw();};});
+
+if(M.stack){
+ document.getElementById('osdHint').textContent=M.h;
+ document.getElementById('osdChart').innerHTML=Rw.map(function(d){
+  var T=d.dc+d.ds+d.st+d.dr;
+  var tip='Fulfillment Mix||*'+d.p+(d.mtd?'  (in progress)':'')+'||'+MIX.map(function(m){
+   return m[1]+': '+n(d[m[0]])+'  ('+p1(d[m[0]]/T)+')';}).join('||')+'||Total orders: '+n(d.t);
+  return '<div class="stk" data-tip="'+esc(tip)+'">'+MIX.map(function(m){
+   return '<i style="height:'+(d[m[0]]/T*100)+'%;background:'+cv(m[2])+'"></i>';}).join('')+'</div>';}).join('');
+ document.getElementById('osdLeg').innerHTML=MIX.map(function(m){
+  return '<span data-tip="'+esc(m[1]+'||'+m[3])+'"><i class="dt" style="background:'+cv(m[2])+'"></i>'+m[1]+'</span>';}).join('');
+}else{
+ var vals=[];Rw.forEach(function(d){vals.push(d[M.k]);if(M.ly)vals.push(d[M.ly]);});
+ var hi=Math.max.apply(null,vals),lo=Math.min.apply(null,vals),base=0;
+ if(M.z&&hi>lo){base=Math.max(0,lo-(hi-lo)*0.30);}
+ var span=(hi-base)||1;
+ document.getElementById('osdHint').textContent=M.h+(base>0?'  Axis starts at '+fv(base,M.fmt)+' so differences between periods stay visible.':'');
+ document.getElementById('osdChart').innerHTML=Rw.map(function(d){
+  var ty=Math.max(1,(d[M.k]-base)/span*100),ly=M.ly?Math.max(1,(d[M.ly]-base)/span*100):0;
+  var t1=d.mtd?cv('--gr'):c,t2=d.mtd?cv('--grd'):cd;
+  var tip=GR[G].n+'||*'+d.p+(d.mtd?'  (in progress)':'')+'||'+grpLines(d).join('||');
+  return '<div class="gp" data-tip="'+esc(tip)+'">'+
+  '<i style="height:'+ty.toFixed(1)+'%;background:linear-gradient(180deg,'+t1+','+t2+')"></i>'+
+  (M.ly?'<i style="height:'+ly.toFixed(1)+'%;background:#3a3f52"></i>':'')+'</div>';}).join('');
+ document.getElementById('osdLeg').innerHTML=
+ '<span data-tip="This Year||Value for the period shown."><i class="dt" style="background:'+c+'"></i>This year</span>'+
+ (M.ly?'<span data-tip="Last Year||The same period a year earlier, re-dated so it lines up with this year."><i class="dt" style="background:#3a3f52"></i>Last year</span>':'')+
+ '<span data-tip="In Progress||The newest period has not finished, so its figures are partial."><i class="dt" style="background:'+cv('--gr')+'"></i>In progress</span>';
+}
+/* show every label while they fit; only thin once the range gets dense,
+   as it does at daily grain. Every bar still names itself on hover. */
+var step=Math.ceil(Rw.length/30);
+document.getElementById('osdXl').innerHTML=Rw.map(function(d,i){
+var show=(step<2)||(i%step===0)||(i===Rw.length-1);
+return '<span class="'+(SEL===d.p?'on':'')+'">'+(show?d.p:'')+'</span>';}).join('');}
+
+var CO=[
+{k:'id',l:GRAIN,g:'vol',c:'l',t:GRAIN+'||The period grain you selected when running the report, newest first.||Sorting uses the underlying period id, so the timeline stays in calendar order whatever the label reads.',f:function(d){return d.p+(d.mtd?' <span class="mut">in progress</span>':'');}},
+{k:'t',l:'Orders',g:'vol',t:'Orders||Digital orders with at least one ship-to-address line.||Buy online pick up in store and call center orders are excluded.',f:function(d){return n(d.t);}},
+{k:'tLY',l:'Orders LY',g:'vol',t:'Orders Last Year||The same period a year earlier.||Re-dated through the fiscal calendar so it lines up with this year at any grain.',f:function(d){return '<span class="mut">'+n(d.tLY)+'</span>';}},
+{k:'yoy',l:'YoY %',g:'vol',t:'Year over Year||Change in order volume against the same period last year.',f:function(d){return '<span class="'+(d.yoy>0?'up':'dn')+'">'+(d.yoy>0?'+':'')+p1(d.yoy)+'</span>';}},
+{k:'dc',l:'DC only',g:'mix',t:'DC Only||Orders fulfilled entirely from the distribution center.',f:function(d){return n(d.dc);}},
+{k:'ds',l:'DC + store',g:'mix',t:'DC + Store||Orders where the DC and at least one store each fulfilled part of the order.',f:function(d){return n(d.ds);}},
+{k:'st',l:'Store only',g:'mix',t:'Store Only||Orders fulfilled entirely by one or more stores.',f:function(d){return n(d.st);}},
+{k:'dr',l:'Dropship',g:'mix',t:'Dropship||Orders shipped direct by a vendor rather than the DC or a store.',f:function(d){return n(d.dr);}},
+{k:'mb',l:'Mix',g:'mix',t:'Mix||Share of the period by fulfillment path.||Hover any segment for its own count and share.',f:function(d){var T=d.dc+d.ds+d.st+d.dr;
+return '<div class="mb">'+MIX.map(function(m){
+ return '<i data-tip="'+esc(m[1]+'||*'+d.p+'||'+n(d[m[0]])+' orders  ('+p1(d[m[0]]/T)+')||'+m[3])+'" style="background:'+cv(m[2])+';width:'+(d[m[0]]/T*100)+'%"></i>';}).join('')+'</div>';}},
+{k:'spl',l:'Split orders',g:'spl',t:'Split Orders||Orders sent to two or more ship-from locations.',f:function(d){return n(d.spl);}},
+{k:'r',l:'Split rate',g:'spl',t:'Split Rate||Split orders as a share of all digital orders.||Lower is better.',f:function(d){return '<b style="color:'+cv('--gs')+'">'+p2(d.r)+'</b>';}},
+{k:'rLY',l:'Rate LY',g:'spl',t:'Split Rate Last Year||Split rate for the same period a year earlier.',f:function(d){return '<span class="mut">'+p2(d.rLY)+'</span>';}},
+{k:'d',l:'vs LY (pts)',g:'spl',t:'Split Rate vs Last Year||This year split rate minus last year, in percentage points.||Negative means fewer orders splitting, so lower is better.',f:function(d){return '<b class="'+(d.d<-.05?'up':d.d>.05?'dn':'nu')+'">'+(d.d>0?'+':'')+d2(d.d)+'</b>';}},
+{k:'loc',l:'Avg locations',g:'spl',t:'Average Locations||Average number of ship-from locations per order.',f:function(d){return d2(d.loc);}},
+{k:'rel',l:'Releases',g:'rel',t:'Releases||Total releases in the period.||One release is one pick assignment, so this is the workload total.',f:function(d){return n(d.rel);}},
+{k:'ar',l:'Per order',g:'rel',t:'Releases per Order||Average releases per order.||An order fulfilled first time is one release.',f:function(d){return d2(d.ar);}},
+{k:'arLY',l:'Per order LY',g:'rel',t:'Releases per Order Last Year||Average releases per order for the same period a year earlier.',f:function(d){return '<span class="mut">'+d2(d.arLY)+'</span>';}},
+{k:'mx',l:'Max',g:'rel',t:'Max Releases||Highest number of releases on a single order in the period.||A high value points to an order that bounced between locations before it settled.',f:function(d){return '<span class="'+(d.mx>=100?'dn':'')+'">'+d.mx+'</span>';}},
+{k:'nc',l:'Not complete',g:'cmp',t:'Not Complete||Orders where something has not shipped yet.||The newest period always reads high because those orders are still moving.',f:function(d){return n(d.nc);}},
+{k:'cn',l:'Cancelled',g:'cmp',t:'Cancelled||Orders with at least one cancelled unit.',f:function(d){return n(d.cn);}},
+{k:'nr',l:'No release',g:'cmp',t:'No Release||Orders with no release record.||This is a data check and should stay near zero.',f:function(d){return n(d.nr);}}];
+
+function table(){
+document.getElementById('osdPerTitle').textContent='By '+GRAIN;
+document.getElementById('osdTh').innerHTML='<tr>'+CO.map(function(c){var col=cv(GR[c.g].c);
+return '<th data-k="'+c.k+'" data-tip="'+esc(c.t)+'" class="'+(c.c||'')+'" style="color:'+col+
+';background:'+(SK===c.k?'#1e2029':'transparent')+';border-bottom-color:'+col+'">'+c.l+'</th>';}).join('')+'</tr>';
+Array.prototype.forEach.call(R.querySelectorAll('#osdTh th'),function(th){
+th.onclick=function(){var k=th.getAttribute('data-k');if(k==='mb')return;
+if(SK===k){SD=-SD;}else{SK=k;SD=(k==='id'?-1:1);}tipHide();draw();};});
+var Rw=rows().slice().sort(function(a,b){var x=a[SK],y=b[SK];
+return (typeof x==='string'?(x<y?-1:x>y?1:0):x-y)*SD;});
+document.getElementById('osdTb').innerHTML=Rw.map(function(d){
+return '<tr data-p="'+d.p+'" class="'+(SEL===d.p?'on':'')+'">'+CO.map(function(c){
+return '<td class="'+(c.c||'')+'">'+c.f(d)+'</td>';}).join('')+'</tr>';}).join('');
+Array.prototype.forEach.call(R.querySelectorAll('#osdTb tr'),function(tr){
+tr.onclick=function(){var p=tr.getAttribute('data-p');SEL=SEL===p?null:p;tipHide();draw();};});
+document.getElementById('osdMixLeg').innerHTML=MIX.map(function(m){
+return '<span data-tip="'+esc(m[1]+'||'+m[3])+'"><i class="dt" style="background:'+cv(m[2])+'"></i>'+m[1]+'</span>';}).join('');}
+
+function drawer(){var el=document.getElementById('osdDrawer');
+if(!SEL){el.className='dw';return;}
+var d=null;D.forEach(function(x){if(x.p===SEL)d=x;});if(!d){el.className='dw';return;}
+el.className='dw on';var T=d.dc+d.ds+d.st+d.dr;
+var card=function(g,t,rw){return '<div class="dc" style="border-top-color:'+cv(GR[g].c)+'">'+
+'<div class="t" style="color:'+cv(GR[g].c)+'">'+t+'</div>'+rw.map(function(a){
+return '<div class="rw"><span>'+a[0]+'</span><span>'+a[1]+'</span></div>';}).join('')+'</div>';};
+el.innerHTML='<div class="ph"><h3>'+d.p+(d.mtd?' &middot; in progress':'')+'</h3>'+
+'<div class="hint">click the row again to close</div></div><div class="dg">'+
+card('vol','Volume',[['Orders',n(d.t)],['Orders last year',n(d.tLY)],['Year over year',(d.yoy>0?'+':'')+p1(d.yoy)]])+
+card('mix','Mix',[['DC only',n(d.dc)+' ('+p1(d.dc/T)+')'],['DC + store',n(d.ds)+' ('+p1(d.ds/T)+')'],
+['Store only',n(d.st)+' ('+p1(d.st/T)+')'],['Dropship',n(d.dr)+' ('+p1(d.dr/T)+')']])+
+card('spl','Splits',[['Split orders',n(d.spl)],['Split rate',p2(d.r)],['Rate last year',p2(d.rLY)],
+['vs last year',(d.d>0?'+':'')+d2(d.d)+' pts']])+
+card('rel','Releases',[['Total',n(d.rel)],['Per order',d2(d.ar)],['Per order last year',d2(d.arLY)],
+['Per split order',d2(d.arS)],['Max on one order',d.mx]])+
+card('cmp','Completeness',[['Not complete',n(d.nc)],['Not complete share',p2(d.ncp)],
+['Cancelled units',n(d.cn)],['No release',n(d.nr)]])+'</div>';}
+
+function head(){var cl=rows().filter(function(d){return !d.mtd;});
+if(!cl.length){document.getElementById('osdHead').textContent='';return;}
+var imp=cl.filter(function(d){return d.d<0;}).length;
+var best=cl.reduce(function(a,b){return b.d<a.d?b:a;});
+document.getElementById('osdHead').innerHTML='Split rate improved against last year in <b style="color:'+
+cv('--gs')+'">'+imp+' of '+cl.length+'</b> completed periods in this view, best at '+
+Math.abs(best.d).toFixed(2)+' points in '+best.p+
+'. Store-only fulfillment is rising while the split rate falls, so more orders are being completed from a single store instead of scattering across several.';}
+
+function draw(){kpi();chart();table();drawer();head();}
+Array.prototype.forEach.call(R.querySelectorAll('#osdFy button'),function(b){
+b.onclick=function(){FY=b.getAttribute('data-fy');
+Array.prototype.forEach.call(R.querySelectorAll('#osdFy button'),function(x){x.className='';});
+b.className='on';SEL=null;tipHide();draw();};});
+draw();
+})();
+</script>
+</body>
+</html>
